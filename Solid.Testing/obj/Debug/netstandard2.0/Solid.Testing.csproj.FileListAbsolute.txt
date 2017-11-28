@@ -1,9 +1,0 @@
-H:\github\SolidSoftworks\Solid.Testing\Solid.Testing\bin\Debug\netstandard2.0\Solid.Testing.deps.json
-H:\github\SolidSoftworks\Solid.Testing\Solid.Testing\bin\Debug\netstandard2.0\Solid.Testing.dll
-H:\github\SolidSoftworks\Solid.Testing\Solid.Testing\obj\Debug\netstandard2.0\Solid.Testing.csprojResolveAssemblyReference.cache
-H:\github\SolidSoftworks\Solid.Testing\Solid.Testing\obj\Debug\netstandard2.0\Solid.Testing.csproj.CoreCompileInputs.cache
-H:\github\SolidSoftworks\Solid.Testing\Solid.Testing\obj\Debug\netstandard2.0\Solid.Testing.AssemblyInfoInputs.cache
-H:\github\SolidSoftworks\Solid.Testing\Solid.Testing\obj\Debug\netstandard2.0\Solid.Testing.AssemblyInfo.cs
-H:\github\SolidSoftworks\Solid.Testing\Solid.Testing\bin\Debug\netstandard2.0\Solid.Testing.pdb
-H:\github\SolidSoftworks\Solid.Testing\Solid.Testing\obj\Debug\netstandard2.0\Solid.Testing.dll
-H:\github\SolidSoftworks\Solid.Testing\Solid.Testing\obj\Debug\netstandard2.0\Solid.Testing.pdb
