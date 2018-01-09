@@ -16,6 +16,7 @@ namespace Solid.Testing
 
         internal TestingServer(InMemoryHost host, ServiceProvider provider)
         {
+            _scopes = new List<IServiceScope>();
             _host = host;
             _root = provider;
         }
