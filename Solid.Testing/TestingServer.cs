@@ -37,7 +37,6 @@ namespace Solid.Testing
             HttpBuilder = new SolidHttpBuilder(Services);            
         }
 
-
         public IServiceCollection Services { get; }
         public SolidHttpBuilder HttpBuilder { get; }
         public SolidHttpClient Client => _lazyFactory.Value.CreateWithBaseAddress(_lazyHost.Value.BaseAddress);

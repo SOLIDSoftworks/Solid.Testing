@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using System.Linq;
 
-namespace Solid.Testing.Factories
+namespace Solid.Testing.Extensions.AspNetCore.Factories
 {
-    public class AspNetCoreInMemoryHostFactory : IInMemoryHostFactory
+    internal class AspNetCoreInMemoryHostFactory : IInMemoryHostFactory
     {
         public InMemoryHost CreateHost<TStartup>()
         {
