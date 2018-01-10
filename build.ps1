@@ -45,8 +45,10 @@ function Invoke-MsBuildPack {
         [xml] $xml
     )
     process {
-        Write-Verbose "Invoking msbuild /t:restore /t:rebuild /t:pack for $project"
-        . $msbuild $project /nologo /t:restore /t:rebuild /t:pack /verbosity:minimal "/property:Configuration=$configuration"
+        Write-Verbose "Invoking msbuild /t:restore for $project"
+        . $msbuild $project /nologo /t:restore /verbosity:minimal
+        Write-Verbose "Invoking msbuild /t:rebuild /t:pack for $project"
+        . $msbuild $project /nologo /t:rebuild /t:pack /verbosity:minimal "/property:Configuration=$configuration"
         if($LASTEXITCODE) {
             Write-Error "Build failed for $project"
             exit 1
