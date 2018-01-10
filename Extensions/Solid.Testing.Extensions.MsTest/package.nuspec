@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id></id>
+    <version></version>
+    <description>Solid.Testing asserter for legacy mstest</description>
+    <authors>SolidSoftworks</authors>
+  
+    <!-- Optional elements -->
+    <dependencies>
+      <dependency id="Solid.Testing.Core" version="" />
+    </dependencies>
+	<frameworkAssemblies>
+	  <frameworkAssembly assemblyName="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+	</frameworkAssemblies>
+  </metadata>
+</package>

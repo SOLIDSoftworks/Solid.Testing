@@ -46,6 +46,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="package.nuspec" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Solid.Testing.Core\Solid.Testing.Core.csproj">
       <Project>{2E523906-EE8F-49EF-8530-ACD57FDD7AF3}</Project>
       <Name>Solid.Testing.Core</Name>

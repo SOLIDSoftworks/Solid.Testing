@@ -6,10 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit" Version="2.3.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.1.11" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.1.11" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Solid.Testing.Core\Solid.Testing.Core.csproj" />
   </ItemGroup>
+
 </Project>

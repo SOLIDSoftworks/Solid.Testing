@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Solid.Testing.Core\Solid.Testing.Core.csproj" />
+    <ProjectReference Include="..\..\Solid.Testing.Core\Solid.Testing.Core.csproj" />
   </ItemGroup>
 
 </Project>
