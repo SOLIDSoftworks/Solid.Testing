@@ -45,8 +45,8 @@ function Invoke-MsBuildPack {
         [xml] $xml
     )
     process {
-        Write-Verbose "Invoking msbuild /t:pack for $project"
-        . $msbuild $project /nologo /t:pack /verbosity:minimal "/property:Configuration=$configuration"
+        Write-Verbose "Invoking msbuild /t:restore /t:rebuild /t:pack for $project"
+        . $msbuild $project /nologo /t:restore /t:rebuild /t:pack /verbosity:minimal "/property:Configuration=$configuration"
     }
 }
 
@@ -98,7 +98,21 @@ function Update-Nuspec {
     }
 }
 
-function Invoke-Nuget {
+function Invoke-NugetRestore {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string] $project,
+        [Parameter(Mandatory=$true)]
+        [xml] $xml
+    )
+    process {
+        Write-Verbose "Invoking nuget restore for $project"
+        . $nuget restore $project
+    }
+}
+
+function Invoke-NugetPack {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
@@ -120,29 +134,27 @@ function Invoke-Nuget {
             $path = Update-Nuspec -path $nuspec.FullName -id $name -assembly $assemblyName
         }
 
-        Write-Verbose "Invoking nuget for $path"
+        Write-Verbose "Invoking nuget pack for $path"
         . $nuget pack $path
     }
 }
 
-$artifacts = [IO.Path]::Combine($srcPath, 'artifacts')
-if(!(Test-Path $artifacts)) {
-    Write-Verbose "Creating folder: $artifacts"
-    New-Item -Path $artifacts -ItemType directory | Out-Null
-}
+#$artifacts = [IO.Path]::Combine($srcPath, 'artifacts')
+#if(!(Test-Path $artifacts)) {
+#    Write-Verbose "Creating folder: $artifacts"
+#    New-Item -Path $artifacts -ItemType directory | Out-Null
+#}
 
 $projects = Find-Projects
 foreach($project in $projects) {
     $path = $project.FullName
     $xml = [xml](Get-Content -Path $path)
     if(Test-LegacyProject -project $path -xml $xml) {
+        Invoke-NugetRestore -project $path -xml $xml
         Invoke-MsBuild -project $path -xml $xml
-        Invoke-Nuget -project $path -xml $xml
+        Invoke-NugetPack -project $path -xml $xml
     }
     else {
         Invoke-MsBuildPack -project $path -xml $xml        
     }
 }
-
-# C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\15.0\Bin\MSBuild.exe
-# H:\nuget.exe
