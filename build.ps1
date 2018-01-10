@@ -47,6 +47,10 @@ function Invoke-MsBuildPack {
     process {
         Write-Verbose "Invoking msbuild /t:restore /t:rebuild /t:pack for $project"
         . $msbuild $project /nologo /t:restore /t:rebuild /t:pack /verbosity:minimal "/property:Configuration=$configuration"
+        if($LASTEXITCODE) {
+            Write-Error "Build failed for $project"
+            exit 1
+        }
     }
 }
 
@@ -61,6 +65,10 @@ function Invoke-MsBuild {
     process {
         Write-Verbose "Invoking msbuild for $project"
         . $msbuild $project /nologo /verbosity:minimal "/property:Configuration=$configuration"
+        if($LASTEXITCODE) {
+            Write-Error "Build failed for $project"
+            exit 1
+        }
     }
 }
 
@@ -109,6 +117,10 @@ function Invoke-NugetRestore {
     process {
         Write-Verbose "Invoking nuget restore for $project"
         . $nuget restore $project
+        if($LASTEXITCODE) {
+            Write-Error "Restore failed for $project"
+            exit 1
+        }
     }
 }
 
@@ -136,6 +148,10 @@ function Invoke-NugetPack {
 
         Write-Verbose "Invoking nuget pack for $path"
         . $nuget pack $path
+        if($LASTEXITCODE) {
+            Write-Error "Pack failed for $project"
+            exit 1
+        }
     }
 }
 
@@ -155,6 +171,6 @@ foreach($project in $projects) {
         Invoke-NugetPack -project $path -xml $xml
     }
     else {
-        Invoke-MsBuildPack -project $path -xml $xml        
+        Invoke-MsBuildPack -project $path -xml $xml 
     }
 }
