@@ -6,7 +6,7 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Solid.Testing.Models;
 
-namespace Solid.Testing.Extensions
+namespace Solid.Testing
 {
     public static class AssertionContinuationExtensions
     {

@@ -7,7 +7,7 @@ using System.Net;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Solid.Testing.Extensions
+namespace Solid.Testing
 {
     public static class SolidHttpRequestExtensions
     {

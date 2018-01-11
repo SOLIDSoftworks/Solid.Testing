@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Solid.Testing.Extensions
+namespace Solid.Testing
 {
     public static class HeaderAssertionExtensions
     {
