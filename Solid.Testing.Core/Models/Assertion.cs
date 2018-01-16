@@ -5,6 +5,7 @@ using System.Text;
 using Solid.Http;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace Solid.Testing.Models
 {
@@ -17,11 +18,12 @@ namespace Solid.Testing.Models
 
         public SolidHttpRequest Request { get; }
 
-        public TaskAwaiter GetAwaiter()
+        public TaskAwaiter<HttpResponseMessage> GetAwaiter()
         {
-            Func<Assertion, Task> waiter = (async r =>
+            Func<Assertion, Task<HttpResponseMessage>> waiter = (async r =>
             {
-                await Request;
+                var response = await Request;
+                return response;
             });
             return waiter(this).GetAwaiter();
         }
