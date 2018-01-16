@@ -9,14 +9,14 @@ namespace Solid.Testing.Models
 {
     public class HeaderAssertion : Assertion
     {
-        public HeaderAssertion(string name, AssertionContinuation continuation)
-            : base(continuation.Assertion.Request)
+        public HeaderAssertion(string name, Assertion assertion)
+            : base(assertion.Request)
         {
             Name = name;
-            Continuation = continuation;
+            Assertion = assertion;
         }
 
         internal string Name { get; }
-        public AssertionContinuation Continuation { get; }
+        public Assertion Assertion { get; }
     }
 }

@@ -50,7 +50,7 @@ namespace Solid.Testing
 
         private static HeaderAssertion WithValueComparer(this HeaderAssertion assertion, Func<IEnumerable<string>, bool> compare, string message)
         {
-            assertion.Continuation.Should((response, asserter) =>
+            assertion.Assertion.Should((response, asserter) =>
             {
                 var header = response.GetHeaderValues(assertion.Name);
                 asserter.IsTrue(compare(header), message);

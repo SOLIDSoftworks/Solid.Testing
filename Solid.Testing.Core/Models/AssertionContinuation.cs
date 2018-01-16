@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Text;
 
-namespace Solid.Testing.Models
-{
-    public class AssertionContinuation
-    {
-        public AssertionContinuation(Assertion assertion)
-        {
-            Assertion = assertion;
-        }
+//namespace Solid.Testing.Models
+//{
+//    public class AssertionContinuation
+//    {
+//        public AssertionContinuation(Assertion assertion)
+//        {
+//            Assertion = assertion;
+//        }
 
-        internal Assertion Assertion { get; }
-    }
-}
+//        internal Assertion Assertion { get; }
+//    }
+//}
