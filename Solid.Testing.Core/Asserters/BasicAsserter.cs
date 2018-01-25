@@ -81,19 +81,19 @@ namespace Solid.Testing.Services
         public void IsNotNull(object value, string message)
         {
             if (value == null)
-                throw new NotImplementedException(message);
+                throw new BasicAssertionException(message);
         }
 
         public void IsNull(object value, string message)
         {
             if (value != null)
-                throw new NotImplementedException(message);
+                throw new BasicAssertionException(message);
         }
 
         public void IsTrue(bool value, string message)
         {
             if (!value)
-                throw new NotImplementedException(message);
+                throw new BasicAssertionException(message);
         }
 
         class BasicAssertionException : Exception
