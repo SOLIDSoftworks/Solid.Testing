@@ -30,16 +30,16 @@ namespace Solid.Testing
             return this;
         }
 
-        public TestingServerBuilder AddAsserter(IAsserter asserter)
-        {
-            return AddServices(s => s.AddSingleton<IAsserter>(asserter));
-        }
+        //public TestingServerBuilder AddAsserter(IAsserter asserter)
+        //{
+        //    return AddServices(s => s.AddSingleton<IAsserter>(asserter));
+        //}
 
-        public TestingServerBuilder AddAsserter<TAsserter>()
-            where TAsserter : class, IAsserter
-        {
-            return AddServices(s => s.AddSingleton<IAsserter, TAsserter>());
-        }
+        //public TestingServerBuilder AddAsserter<TAsserter>()
+        //    where TAsserter : class, IAsserter
+        //{
+        //    return AddServices(s => s.AddSingleton<IAsserter, TAsserter>());
+        //}
 
         public TestingServerBuilder AddServices(Action<IServiceCollection> action)
         {
