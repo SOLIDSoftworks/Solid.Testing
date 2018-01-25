@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Solid.Testing.Abstractions
 {
-    internal interface IAsserter
+    public interface IAsserter
     {
         void AreEqual<T>(T expected, T actual, string message);
         void AreEqual(object expected, object actual, string message);
