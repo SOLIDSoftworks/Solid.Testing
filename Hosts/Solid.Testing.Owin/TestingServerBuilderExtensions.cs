@@ -1,7 +1,7 @@
 ﻿using Solid.Testing.Extensions.Owin.Factories;
 using System;
 
-namespace Solid.Testing.Owin
+namespace Solid.Testing
 {
     public static class TestingServerBuilderExtensions
     {
