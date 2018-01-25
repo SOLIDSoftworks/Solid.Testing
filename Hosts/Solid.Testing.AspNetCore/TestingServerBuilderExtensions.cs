@@ -2,7 +2,7 @@
 using Solid.Testing.Extensions.AspNetCore.Factories;
 using System;
 
-namespace Solid.Testing.Extensions.AspNetCore
+namespace Solid.Testing.AspNetCore
 {
     public static class TestingServerBuilderExtensions
     {
