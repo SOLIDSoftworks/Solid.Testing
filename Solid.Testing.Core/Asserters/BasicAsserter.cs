@@ -10,95 +10,95 @@ namespace Solid.Testing.Services
         public void AreEqual<T>(T expected, T actual, string message)
         {
             if (!object.Equals(expected, actual))
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
         public void AreEqual(object expected, object actual, string message)
         {
             if (!object.Equals(expected, actual))
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
         public void AreNotEqual<T>(T notExpected, T actual, string message)
         {
             if (object.Equals(notExpected, actual))
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
         public void AreNotEqual(object notExpected, object actual, string message)
         {
             if (object.Equals(notExpected, actual))
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
         public void AreNotSame(object notExpected, object actual, string message)
         {
             if (object.ReferenceEquals(notExpected, actual))
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
         public void AreSame(object expected, object actual, string message)
         {
             if (!object.ReferenceEquals(expected, actual))
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
         public void Fail(string message)
         {
-            throw new BasicAssertionException(message);
+            throw new SolidTestingAssertionException(message);
         }
 
         public void IsFalse(bool value, string message)
         {
             if (value)
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
         public void IsInstanceOfType<TExpected>(object actual, string message)
         {
             if (!typeof(TExpected).IsAssignableFrom(actual.GetType()))
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
         public void IsInstanceOfType(Type expected, object actual, string message)
         {
             if (!expected.IsAssignableFrom(actual.GetType()))
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
         public void IsNotInstanceOfType<TNotExpected>(object actual, string message)
         {
             if (typeof(TNotExpected).IsAssignableFrom(actual.GetType()))
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
         public void IsNotInstanceOfType(Type notExpected, object actual, string message)
         {
             if (notExpected.IsAssignableFrom(actual.GetType()))
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
         public void IsNotNull(object value, string message)
         {
             if (value == null)
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
         public void IsNull(object value, string message)
         {
             if (value != null)
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
         public void IsTrue(bool value, string message)
         {
             if (!value)
-                throw new BasicAssertionException(message);
+                throw new SolidTestingAssertionException(message);
         }
 
-        class BasicAssertionException : Exception
+        class SolidTestingAssertionException : Exception
         {
-            public BasicAssertionException(string message) 
+            public SolidTestingAssertionException(string message) 
                 : base(message)
             {
             }
