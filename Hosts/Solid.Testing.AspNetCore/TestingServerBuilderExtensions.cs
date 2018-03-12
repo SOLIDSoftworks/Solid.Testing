@@ -6,9 +6,9 @@ namespace Solid.Testing
 {
     public static class TestingServerBuilderExtensions
     {
-        public static TestingServerBuilder AddAspNetCoreHostFactory(this TestingServerBuilder builder)
+        public static TestingServerBuilder AddAspNetCoreHostFactory(this TestingServerBuilder builder, string scheme = "http", string hostname = "localhost")
         {
-            return builder.AddHostFactory(new AspNetCoreInMemoryHostFactory());            
+            return builder.AddHostFactory(new AspNetCoreInMemoryHostFactory(scheme, hostname));            
         }
     }
 }

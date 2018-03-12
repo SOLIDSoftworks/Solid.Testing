@@ -11,6 +11,15 @@ namespace Solid.Testing.Extensions.AspNetCore.Factories
 {
     internal class AspNetCoreInMemoryHostFactory : IInMemoryHostFactory
     {
+        private string _scheme;
+        private string _hostname;
+
+        public AspNetCoreInMemoryHostFactory(string scheme, string hostname)
+        {
+            _scheme = scheme;
+            _hostname = hostname;
+        }
+
         public InMemoryHost CreateHost<TStartup>()
         {
             return CreateHost(typeof(TStartup));
@@ -18,10 +27,11 @@ namespace Solid.Testing.Extensions.AspNetCore.Factories
 
         public InMemoryHost CreateHost(Type startup)
         {
+            var url = $"{_scheme}://{_hostname}:0";
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseStartup(startup)
-                .Start("http://127.0.0.1:0" /*, "http://[::1]:0"*/);
+                .Start(url);
 
             var urls = host.ServerFeatures.Get<IServerAddressesFeature>();
             var baseAddress = urls.Addresses.Select(s => new Uri(s)).First();
