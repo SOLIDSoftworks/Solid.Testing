@@ -21,6 +21,7 @@ namespace Solid.Testing
             _root = provider;
         }
 
+        public Uri BaseAddress => _host.BaseAddress;
         public IServiceProvider Provider => CreateScope().ServiceProvider;
         public SolidHttpClient Client => Provider.GetService<ISolidHttpClientFactory>().CreateWithBaseAddress(_host.BaseAddress);
 
