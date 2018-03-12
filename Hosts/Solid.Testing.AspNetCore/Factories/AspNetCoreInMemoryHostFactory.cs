@@ -6,6 +6,7 @@ using Solid.Testing.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using System.Linq;
+using System.Net;
 
 namespace Solid.Testing.Extensions.AspNetCore.Factories
 {
@@ -27,16 +28,22 @@ namespace Solid.Testing.Extensions.AspNetCore.Factories
 
         public InMemoryHost CreateHost(Type startup)
         {
-            var url = $"{_scheme}://{_hostname}:0";
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseStartup(startup)
-                .Start(url);
+                .Start($"{_scheme}://127.0.0.1:0");
 
             var urls = host.ServerFeatures.Get<IServerAddressesFeature>();
             var baseAddress = urls.Addresses.Select(s => new Uri(s)).First();
+            var url = new Uri($"{_scheme}://{_hostname}:{baseAddress.Port}");
+            return new InMemoryHost(host, url);
+        }
 
-            return new InMemoryHost(host, baseAddress);
+        private void EnsureLocal()
+        {
+            var addresses = Dns.GetHostAddresses(_hostname);
+            if (!addresses.Any(a => a.Equals(IPAddress.Loopback)))
+                throw new ArgumentException("Parameter must be a local host name", "hostname");
         }
     }
 }
