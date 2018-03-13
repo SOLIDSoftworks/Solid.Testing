@@ -7,7 +7,7 @@ namespace Solid.Testing
     {
         public static TestingServerBuilder AddOwinHostFactory(this TestingServerBuilder builder)
         {
-            return builder.AddHostFactory(new OwinInMemoryHostFactory());
+            return builder.AddHostFactory<OwinInMemoryHostFactory>();
         }
     }
 }
