@@ -55,7 +55,13 @@ namespace Solid.Testing.AspNetCore.Factories
 
         private X509Name CreateSubject(string hostname)
         {
-            var subject = new X509Name($"DN={hostname}");
+            var subject = new X509Name($"CN={hostname}");
+            return subject;
+        }
+
+        private X509Name CreateSubjectAlternateName(string hostname)
+        {
+            var subject = new X509Name($"DNS Name={hostname}");
             return subject;
         }
 
@@ -95,7 +101,6 @@ namespace Solid.Testing.AspNetCore.Factories
         private RSACryptoServiceProvider Convert(AsymmetricKeyParameter privateKey)
         {
             var rsa = privateKey as RsaPrivateCrtKeyParameters;
-
             var parameters = new RSAParameters();
             parameters.Modulus = rsa.Modulus.ToByteArrayUnsigned();
             parameters.Exponent = rsa.PublicExponent.ToByteArrayUnsigned();

@@ -20,8 +20,8 @@ namespace Solid.Testing.AspNetCore.Providers
         public X509Certificate2 GetCertificate(string hostname)
         {
             var store = _storeProvider.GetCertificateStore();
-            var certificates = store.Certificates.Find(X509FindType.FindBySubjectName, hostname, true).Cast<X509Certificate2>();
-            var certificate = certificates.FirstOrDefault(c => c.FriendlyName == "Solid.Testing");
+            var certificates = store.Certificates.Find(X509FindType.FindBySubjectName, hostname, false).Cast<X509Certificate2>();
+            var certificate = certificates.FirstOrDefault(c => c.Verify());
             if (certificate == null)
                 certificate = _factory.CreateSelfSignedCertificate(hostname, "Solid.Testing");
             return certificate;

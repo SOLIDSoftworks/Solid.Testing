@@ -15,14 +15,14 @@ namespace Solid.Testing
     {
         public static TestingServerBuilder AddAspNetCoreHostFactory(this TestingServerBuilder builder, Scheme scheme = Scheme.Http, string hostname = "localhost")
         {
-            var callback = new Func<HttpRequestMessage, X509Certificate2, X509Chain, SslPolicyErrors, bool>((sender, certificate, chain, sslPolicyErrors) =>
-            {
-                return true;
-            });
+            //var callback = new Func<HttpRequestMessage, X509Certificate2, X509Chain, SslPolicyErrors, bool>((sender, certificate, chain, sslPolicyErrors) =>
+            //{
+            //    return true;
+            //});
             return builder.AddTestingServerBuilderServices(services =>
             {
                 services
-                .AddSingleton(callback)
+                //.AddSingleton(callback)
                 .AddSingleton(new SchemeProvider(scheme))
                 .AddSingleton(new HostNameProvider(hostname))
                 .AddSingleton<ICertificateStoreProvider, CertificateStoreProvider>()
