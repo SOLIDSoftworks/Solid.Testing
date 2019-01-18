@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Solid.Http;
 
 namespace Solid.Testing
 {
@@ -23,6 +24,34 @@ namespace Solid.Testing
                 assert(args.Response, asserter);
             };
             return assertion;
+        }
+
+        public static Assertion Should<T>(this Assertion assertion, Action<T, IAsserter> assert)
+        {
+            assertion.Request.OnResponse += (sender, args) =>
+            {
+                //var request = sender as SolidHttpRequest;
+                //var body = assertion.Properties.GetOrAdd("response.body", )
+                //request.as
+
+                //var asserter = args.Services.GetService<IAsserter>();
+                //assert(args.Response, asserter);
+            };
+
+            //if (assertion.Properties.ContainsKey("response.body"))
+            //{
+            //    var body = assertion.Properties["response.body"];
+            //    var cast = default(T);
+            //    if (body != null)
+            //        cast = (T)body;
+            //    assert()
+            //}
+            return assertion;
+        }
+
+        public static Assertion Should<T>(this Assertion assertion, T anonymous, Action<T, IAsserter> assert)
+        {
+            return assertion.Should<T>(assert);
         }
 
         public static HeaderAssertion ShouldHaveResponseHeader(this Assertion assertion, string name)

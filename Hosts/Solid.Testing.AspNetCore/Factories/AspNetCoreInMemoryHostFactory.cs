@@ -44,9 +44,9 @@ namespace Solid.Testing.AspNetCore.Factories
             var host = new WebHostBuilder()
                 .UseKestrel(options =>
                 {
-                    if (_scheme == Scheme.Http)
+                    if (_scheme.HasFlag(Scheme.Http))
                         options.Listen(IPAddress.Loopback, 0);
-                    else
+                    if (_scheme.HasFlag(Scheme.Https))
                         options.Listen(IPAddress.Loopback, 0, o =>
                         {
                             o.UseHttps(_certificateProvider.GetCertificate(_hostname));
@@ -58,10 +58,11 @@ namespace Solid.Testing.AspNetCore.Factories
             host.Start();
                 //.Start($"{_scheme}://127.0.0.1:0");
 
-            var urls = host.ServerFeatures.Get<IServerAddressesFeature>();
-            var baseAddress = urls.Addresses.Select(s => new Uri(s)).First();
-            var url = new Uri($"{Convert(_scheme)}://{_hostname}:{baseAddress.Port}");
-            return new InMemoryHost(host, url);
+            var serverAddresses = host.ServerFeatures.Get<IServerAddressesFeature>();
+            var baseAddresses = serverAddresses.Addresses.Select(s => new Uri(s));
+            var urls = baseAddresses.Select(b => new Uri($"{b.Scheme}://{_hostname}:{b.Port}"));
+            //var url = new Uri($"{Convert(_scheme)}://{_hostname}:{baseAddress.Port}");
+            return new InMemoryHost(host, urls);
         }
 
         private void EnsureLocal()

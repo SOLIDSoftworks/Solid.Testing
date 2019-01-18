@@ -18,6 +18,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Solid.Testing.Owin", "Hosts
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Solid.Testing.AspNetCore", "Hosts\Solid.Testing.AspNetCore\Solid.Testing.AspNetCore.csproj", "{B1CA5F1D-B031-4A94-993C-A829A4C79C76}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B7C55D48-DF4A-4202-8FAC-E478AE896AB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solid.Testing.Core.Tests", "Tests\Solid.Testing.Core.Tests\Solid.Testing.Core.Tests.csproj", "{14AE8951-9313-4395-8484-716F470DEE09}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +40,10 @@ Global
 		{B1CA5F1D-B031-4A94-993C-A829A4C79C76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1CA5F1D-B031-4A94-993C-A829A4C79C76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1CA5F1D-B031-4A94-993C-A829A4C79C76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14AE8951-9313-4395-8484-716F470DEE09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14AE8951-9313-4395-8484-716F470DEE09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14AE8951-9313-4395-8484-716F470DEE09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14AE8951-9313-4395-8484-716F470DEE09}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -43,6 +51,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{3119DC41-27A1-49F2-84E8-98EAA91B2C1C} = {1B0D7DE1-EAF4-42D9-ADD1-4B390A56A27D}
 		{B1CA5F1D-B031-4A94-993C-A829A4C79C76} = {1B0D7DE1-EAF4-42D9-ADD1-4B390A56A27D}
+		{14AE8951-9313-4395-8484-716F470DEE09} = {B7C55D48-DF4A-4202-8FAC-E478AE896AB2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {80D0C5D2-65E9-47C1-9897-CC3CB3E93CA3}

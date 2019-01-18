@@ -19,7 +19,18 @@ function Find-Projects {
     )
     process {
         Write-Verbose "Finding all *.csproj files in $srcPath"
-        Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse -File
+        Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse -File | Where { $_.FullName -notcontains '.Tests.' }
+    }
+}
+
+function Find-TestProjects {
+    [CmdletBinding()]
+    param(
+        
+    )
+    process {
+        Write-Verbose "Finding all *.csproj files in $srcPath"
+        Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse -File | Where { $_.FullName -contains '.Tests.' }
     }
 }
 
@@ -51,6 +62,26 @@ function Invoke-MsBuildPack {
         . $msbuild $project /nologo /t:rebuild /t:pack /verbosity:minimal "/property:Configuration=$configuration"
         if($LASTEXITCODE) {
             Write-Error "Build failed for $project"
+            exit 1
+        }
+    }
+}
+
+function Invoke-MsBuildPack {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string] $project,
+        [Parameter(Mandatory=$true)]
+        [xml] $xml
+    )
+    process {
+        Write-Verbose "Invoking msbuild /t:restore for $project"
+        . $msbuild $project /nologo /t:restore /verbosity:minimal
+        Write-Verbose "Invoking msbuild /t:test for $project"
+        . $msbuild $project /nologo /t:test /verbosity:minimal "/property:Configuration=$configuration"
+        if($LASTEXITCODE) {
+            Write-Error "Test failed for $project"
             exit 1
         }
     }
@@ -175,4 +206,11 @@ foreach($project in $projects) {
     else {
         Invoke-MsBuildPack -project $path -xml $xml 
     }
+}
+
+$tests = Find-TestProjects
+foreach($project in $tests) {
+    $path = $project.FullName
+    $xml = [xml](Get-Content -Path $path)
+    Invoke-MsBuildTest -project $path -xml $xml 
 }
