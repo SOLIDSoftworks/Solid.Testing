@@ -3,6 +3,7 @@ using Solid.Testing.Models;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using Solid.Http.Abstractions;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,11 +18,11 @@ namespace Solid.Testing
         
         public static Assertion Should(this Assertion assertion, Action<HttpResponseMessage, IAsserter> assert)
         {
-            assertion.Request.OnResponse += (sender, args) =>
+            assertion.Request.OnResponse((provider, response) =>
             {
-                var asserter = args.Services.GetService<IAsserter>();
-                assert(args.Response, asserter);
-            };
+                var asserter = provider.GetService<IAsserter>();
+                assert(response, asserter);
+            });
             return assertion;
         }
 

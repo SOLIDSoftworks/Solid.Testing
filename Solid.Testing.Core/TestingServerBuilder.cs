@@ -11,17 +11,11 @@ namespace Solid.Testing
 {
     public class TestingServerBuilder
     {
-        private IServiceCollection _services;
         private IInMemoryHostFactory _hostFactory;
-        private ISolidHttpBuilder _httpBuilder;
+        private Action<IServiceCollection> _servicesAction = (_ => { });
+        private Action<ISolidHttpBuilder> _builderAction = (_ => { });
         private Type _startup;
-
-        public TestingServerBuilder()
-        {
-            _services = new ServiceCollection();
-            _httpBuilder = _services.AddSolidHttp();
-        }
-
+        
         public TestingServerBuilder AddHostFactory(IInMemoryHostFactory factory)
         {
             if (_hostFactory != null)
@@ -41,9 +35,9 @@ namespace Solid.Testing
         //    return AddServices(s => s.AddSingleton<IAsserter, TAsserter>());
         //}
 
-        public TestingServerBuilder AddServices(Action<IServiceCollection> action)
+        public TestingServerBuilder AddTestingServices(Action<IServiceCollection> action)
         {
-            action(_services);
+            _servicesAction += action;
             return this;
         }
 
@@ -60,21 +54,25 @@ namespace Solid.Testing
             return this;
         }
 
-        public TestingServerBuilder AddSolidHttpOptions(Action<ISolidHttpOptions> action)
+        public TestingServerBuilder AddSolidHttpOptions(Action<ISolidHttpBuilder> action)
         {
-            _httpBuilder.AddSolidHttpOptions(action);
+            _builderAction += action;
             return this;
         }
 
         public TestingServer Build()
         {
-            _services.TryAddSingleton<IAsserter, BasicAsserter>();
+            var services = new ServiceCollection()
+                .AddSolidHttp(b => _builderAction(b));
+            _servicesAction(services);            
+
+            services.TryAddSingleton<IAsserter, BasicAsserter>();
             if (_hostFactory == null)
                 throw new InvalidOperationException("Cannot build testing server without an InMemoryHostFactory");
             if (_startup == null)
                 throw new InvalidOperationException("Cannot build testing server without Startup class");
 
-            var provider = _services.BuildServiceProvider();
+            var provider = services.BuildServiceProvider();
             var host = _hostFactory.CreateHost(_startup);
             return new TestingServer(host, provider);
         }

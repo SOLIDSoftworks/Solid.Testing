@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Solid.Testing.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Solid.Testing.Models
 {
-    public class InMemoryHost : IDisposable
+    public class InMemoryHost : IInMemoryHost, IDisposable
     {
         private IDisposable _host;
 

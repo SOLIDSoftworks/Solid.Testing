@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Solid.Testing.Owin", "Hosts
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Solid.Testing.AspNetCore", "Hosts\Solid.Testing.AspNetCore\Solid.Testing.AspNetCore.csproj", "{B1CA5F1D-B031-4A94-993C-A829A4C79C76}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solid.Testing.Abstractions", "Solid.Testing.Abstractions\Solid.Testing.Abstractions.csproj", "{3646734E-4DC0-450E-A659-4FFBD205BE1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{B1CA5F1D-B031-4A94-993C-A829A4C79C76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1CA5F1D-B031-4A94-993C-A829A4C79C76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1CA5F1D-B031-4A94-993C-A829A4C79C76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3646734E-4DC0-450E-A659-4FFBD205BE1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3646734E-4DC0-450E-A659-4FFBD205BE1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3646734E-4DC0-450E-A659-4FFBD205BE1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3646734E-4DC0-450E-A659-4FFBD205BE1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

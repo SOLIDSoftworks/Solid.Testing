@@ -6,35 +6,36 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Solid.Http.Abstractions;
 
 namespace Solid.Testing
 {
     public static class SolidHttpRequestExtensions
     {
-        public static Assertion ShouldRespondWith(this SolidHttpRequest request, HttpStatusCode statusCode)
+        public static Assertion ShouldRespondWith(this ISolidHttpRequest request, HttpStatusCode statusCode)
         {
             return request.ShouldRespondWith((int)statusCode);
         }
 
-        public static Assertion ShouldRespondWith(this SolidHttpRequest request, int statusCode)
+        public static Assertion ShouldRespondWith(this ISolidHttpRequest request, int statusCode)
         {
             var assertion = new Assertion(request);
-            assertion.Request.OnResponse += (sender, args) =>
+            assertion.Request.OnResponse((provider, response) =>
             {
-                var asserter = args.Services.GetService<IAsserter>();
-                asserter.AreEqual(statusCode, (int)args.Response.StatusCode, $"Expected {statusCode} status code. Got {args.Response.StatusCode} instead.");
-            };
+                var asserter = provider.GetService<IAsserter>();
+                asserter.AreEqual(statusCode, (int)response.StatusCode, $"Expected {statusCode} status code. Got {response.StatusCode} instead.");
+            });
             return assertion;
         }
 
-        public static Assertion ShouldRespondSuccessfully(this SolidHttpRequest request)
+        public static Assertion ShouldRespondSuccessfully(this ISolidHttpRequest request)
         {
             var assertion = new Assertion(request);
-            assertion.Request.OnResponse += (sender, args) =>
+            assertion.Request.OnResponse((provider, response) =>
             {
-                var asserter = args.Services.GetService<IAsserter>();
-                asserter.IsTrue(args.Response.IsSuccessStatusCode, $"Expected successful status code. Got {args.Response.StatusCode} instead.");
-            };
+                var asserter = provider.GetService<IAsserter>();
+                asserter.IsTrue(response.IsSuccessStatusCode, $"Expected successful status code. Got {response.StatusCode} instead.");
+            });
             return assertion;
         }
     }

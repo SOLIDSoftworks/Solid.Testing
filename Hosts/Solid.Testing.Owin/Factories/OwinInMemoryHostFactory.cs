@@ -13,7 +13,7 @@ namespace Solid.Testing.Extensions.Owin.Factories
 {
     internal class OwinInMemoryHostFactory : IInMemoryHostFactory
     {
-        public InMemoryHost CreateHost(Type startup)
+        public IInMemoryHost CreateHost(Type startup)
         {
             var listenerType = typeof(Microsoft.Owin.Host.HttpListener.OwinServerFactory);
             var port = GetFreeTcpPort();

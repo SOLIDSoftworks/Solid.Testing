@@ -21,12 +21,12 @@ namespace Solid.Testing.Extensions.AspNetCore.Factories
             _hostname = hostname;
         }
 
-        public InMemoryHost CreateHost<TStartup>()
+        public IInMemoryHost CreateHost<TStartup>()
         {
             return CreateHost(typeof(TStartup));
         }
 
-        public InMemoryHost CreateHost(Type startup)
+        public IInMemoryHost CreateHost(Type startup)
         {
             var host = new WebHostBuilder()
                 .UseKestrel()
