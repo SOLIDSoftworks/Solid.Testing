@@ -7,18 +7,23 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using Solid.Testing.AspNetCore.Abstractions;
+using Solid.Testing.AspNetCore.Options;
+using System.Threading.Tasks;
+using Solid.Testing.AspNetCore.Abstractions.Factories;
 
 namespace Solid.Testing.Extensions.AspNetCore.Factories
 {
     internal class AspNetCoreInMemoryHostFactory : IInMemoryHostFactory
     {
-        private string _scheme;
+        private IWebHostFactory _factory;
         private string _hostname;
 
-        public AspNetCoreInMemoryHostFactory(string scheme, string hostname)
+        public AspNetCoreInMemoryHostFactory(IWebHostFactory factory, UrlOptions options)
         {
-            _scheme = scheme;
-            _hostname = hostname;
+            _factory = factory;
+            _hostname = options.HostName;
         }
 
         public IInMemoryHost CreateHost<TStartup>()
@@ -28,14 +33,15 @@ namespace Solid.Testing.Extensions.AspNetCore.Factories
 
         public IInMemoryHost CreateHost(Type startup)
         {
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseStartup(startup)
-                .Start($"{_scheme}://127.0.0.1:0");
+            EnsureLocal();
+
+            var host = _factory.CreateWebHost(startup, _hostname);
 
             var urls = host.ServerFeatures.Get<IServerAddressesFeature>();
-            var baseAddress = urls.Addresses.Select(s => new Uri(s)).First();
-            var url = new Uri($"{_scheme}://{_hostname}:{baseAddress.Port}");
+            var baseAddresses = urls.Addresses.Select(s => new Uri(s));
+            var baseAddress = baseAddresses.First();
+            //var baseAddress = urls.Addresses.Select(s => new Uri(s)).First();
+            var url = new Uri($"{baseAddress.Scheme}://{_hostname}:{baseAddress.Port}");
             return new InMemoryHost(host, url);
         }
 

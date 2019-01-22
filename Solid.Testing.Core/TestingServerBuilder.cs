@@ -6,21 +6,39 @@ using Solid.Testing.Abstractions;
 using Solid.Testing.Services;
 using System;
 using System.Linq;
+using System.Net.Http;
 
 namespace Solid.Testing
 {
     public class TestingServerBuilder
     {
-        private IInMemoryHostFactory _hostFactory;
+    //    private IInMemoryHostFactory _hostFactory;
         private Action<IServiceCollection> _servicesAction = (_ => { });
         private Action<ISolidHttpBuilder> _builderAction = (_ => { });
         private Type _startup;
         
+        public TestingServerBuilder AddHostFactory<TFactory>()
+            where TFactory : class, IInMemoryHostFactory
+        {
+            AddTestingServices(services =>
+            {
+                var descriptor = services.FirstOrDefault(s => s.ServiceType == typeof(IInMemoryHostFactory));
+                if (descriptor != null)
+                    throw new InvalidOperationException($"Host factory ({descriptor.ServiceType.FullName}) has already been added.");
+                services.AddSingleton<IInMemoryHostFactory, TFactory>();
+            });
+            return this;
+        }
+
         public TestingServerBuilder AddHostFactory(IInMemoryHostFactory factory)
         {
-            if (_hostFactory != null)
-                throw new InvalidOperationException($"Host factory ({_hostFactory.GetType().FullName}) has already been added.");
-            _hostFactory = factory;
+            AddTestingServices(services =>
+            {
+                var descriptor = services.FirstOrDefault(s => s.ServiceType == typeof(IInMemoryHostFactory));
+                if (descriptor != null)
+                    throw new InvalidOperationException($"Host factory ({descriptor.ServiceType.FullName}) has already been added.");
+                services.AddSingleton<IInMemoryHostFactory>(factory);
+            });
             return this;
         }
 
@@ -62,18 +80,19 @@ namespace Solid.Testing
 
         public TestingServer Build()
         {
-            var services = new ServiceCollection()
-                .AddSolidHttp(b => _builderAction(b));
-            _servicesAction(services);            
+            var services = new ServiceCollection();
+            _servicesAction(services);   
+            services.AddSolidHttp(b => _builderAction(b));
 
             services.TryAddSingleton<IAsserter, BasicAsserter>();
-            if (_hostFactory == null)
+            var provider = services.BuildServiceProvider();
+            var factory = provider.GetService<IInMemoryHostFactory>();
+            if (factory == null)
                 throw new InvalidOperationException("Cannot build testing server without an InMemoryHostFactory");
             if (_startup == null)
                 throw new InvalidOperationException("Cannot build testing server without Startup class");
 
-            var provider = services.BuildServiceProvider();
-            var host = _hostFactory.CreateHost(_startup);
+            var host = factory.CreateHost(_startup);
             return new TestingServer(host, provider);
         }
     }
