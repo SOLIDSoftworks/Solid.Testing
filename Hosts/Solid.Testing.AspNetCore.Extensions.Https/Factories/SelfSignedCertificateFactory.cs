@@ -4,6 +4,7 @@ using Solid.Testing.AspNetCore.Extensions.Https.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -16,6 +17,14 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Factories
     {
         public X509Certificate2 GenerateCertificate(string hostname)
         {
+            //using (var store = new X509Store(StoreLocation.LocalMachine))
+            //{
+            //    store.Open(OpenFlags.ReadOnly);
+            //    return store.Certificates.Find(X509FindType.FindBySubjectName, "localhost", true).Cast<X509Certificate2>().FirstOrDefault();
+            //}
+
+
+
             var builder = new SubjectAlternativeNameBuilder();
             builder.AddIpAddress(IPAddress.Loopback);
             builder.AddIpAddress(IPAddress.IPv6Loopback);

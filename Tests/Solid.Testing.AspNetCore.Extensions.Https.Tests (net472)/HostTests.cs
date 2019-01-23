@@ -10,16 +10,21 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Tests
 {
     public class HostTests
     {
-        [Fact]
-        public async Task ShouldServeHttps()
-        {
-            var server = new TestingServerBuilder()
+        public TestingServer BuildServer() => new TestingServerBuilder()
                 .AddAspNetCoreHttpsHostFactory()
                 .AddStartup<Startup>()
                 .Build();
-            var response = await server.Client.GetAsync("/").AsText();
-            var https = bool.Parse(response);
-            Assert.True(https);
+
+        [Fact]
+        public async Task ShouldServeHttps()
+        {
+            using (var server = BuildServer())
+            {
+                var response = await server.Client.GetAsync("/");
+                var text = await response.Content.ReadAsStringAsync();
+                var https = bool.Parse(text);
+                Assert.True(https);
+            }
         }
 
         public class Startup
