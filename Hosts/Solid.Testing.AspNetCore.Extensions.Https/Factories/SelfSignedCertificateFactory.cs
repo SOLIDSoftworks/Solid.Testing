@@ -1,5 +1,4 @@
-﻿
-using Solid.Testing.AspNetCore.Abstractions;
+﻿using Solid.Testing.AspNetCore.Abstractions;
 using Solid.Testing.AspNetCore.Extensions.Https.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -17,14 +16,6 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Factories
     {
         public X509Certificate2 GenerateCertificate(string hostname)
         {
-            //using (var store = new X509Store(StoreLocation.LocalMachine))
-            //{
-            //    store.Open(OpenFlags.ReadOnly);
-            //    return store.Certificates.Find(X509FindType.FindBySubjectName, "localhost", true).Cast<X509Certificate2>().FirstOrDefault();
-            //}
-
-
-
             var builder = new SubjectAlternativeNameBuilder();
             builder.AddIpAddress(IPAddress.Loopback);
             builder.AddIpAddress(IPAddress.IPv6Loopback);
@@ -37,7 +28,6 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Factories
 
                 request.CertificateExtensions.Add(
                     new X509KeyUsageExtension(X509KeyUsageFlags.DataEncipherment | X509KeyUsageFlags.KeyEncipherment | X509KeyUsageFlags.DigitalSignature, false));
-
 
                 request.CertificateExtensions.Add(
                    new X509EnhancedKeyUsageExtension(
