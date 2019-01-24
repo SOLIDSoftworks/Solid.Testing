@@ -12,6 +12,7 @@ using Solid.Testing.AspNetCore.Abstractions;
 using Solid.Testing.AspNetCore.Options;
 using System.Threading.Tasks;
 using Solid.Testing.AspNetCore.Abstractions.Factories;
+using Solid.Testing.Abstractions.Factories;
 
 namespace Solid.Testing.Extensions.AspNetCore.Factories
 {

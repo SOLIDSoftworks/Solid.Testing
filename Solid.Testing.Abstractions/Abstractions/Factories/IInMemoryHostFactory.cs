@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Solid.Testing.Abstractions
+namespace Solid.Testing.Abstractions.Factories
 {
     public interface IInMemoryHostFactory
     {

@@ -8,6 +8,7 @@ using Solid.Testing.Models;
 using Microsoft.Owin.Hosting;
 using System.Net.Sockets;
 using System.Net;
+using Solid.Testing.Abstractions.Factories;
 
 namespace Solid.Testing.Extensions.Owin.Factories
 {

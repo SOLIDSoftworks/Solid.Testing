@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Solid.Testing.AspNetCore.Abstractions.Factories;
+using Solid.Testing.AspNetCore.Abstractions.Providers;
 using Solid.Testing.AspNetCore.Extensions.Https.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -8,15 +9,19 @@ using System.Text;
 
 namespace Solid.Testing.AspNetCore.Extensions.Https.Factories
 {
-    internal class HttpsWebHostFactory : IWebHostFactory
+    internal class HttpsWebHostFactory : WebHostFactory
     {
         private ISelfSignedCertificateFactory _certificateFactory;
+        private IWebHostOptionsProvider _provider;
 
-        public HttpsWebHostFactory(ISelfSignedCertificateFactory factory)
+        public HttpsWebHostFactory(ISelfSignedCertificateFactory factory, IWebHostOptionsProvider provider)
+            : base(provider)
         {
             _certificateFactory = factory;
+            _provider = provider;
         }
-        public IWebHost CreateWebHost(Type startup, string hostname)
+
+        protected override IWebHostBuilder InitializeWebHostBuilder(Type startup, string hostname)
         {
             var certificate = _certificateFactory.GenerateCertificate(hostname);
             return new WebHostBuilder()
@@ -24,9 +29,7 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Factories
                 {
                     options.Listen(IPAddress.Loopback, 0, listener => listener.UseHttps(certificate));
                 })
-                .UseStartup(startup)
-                .Start()
-            ;
+                .UseStartup(startup);
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Solid.Http;
 using Solid.Http.Abstractions;
 using Solid.Testing.Abstractions;
+using Solid.Testing.Abstractions.Factories;
 using Solid.Testing.Services;
 using System;
 using System.Linq;

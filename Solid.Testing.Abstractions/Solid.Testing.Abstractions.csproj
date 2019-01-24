@@ -5,4 +5,8 @@
     <RootNamespace>Solid.Testing</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Abstractions\Providers\" />
+  </ItemGroup>
+
 </Project>
