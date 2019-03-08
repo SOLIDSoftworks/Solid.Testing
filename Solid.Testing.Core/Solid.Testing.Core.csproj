@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -6,8 +6,20 @@
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>H:\github\SolidSoftworks\Solid.Testing\Solid.Testing.Core\Solid.Testing.Core.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>H:\github\SolidSoftworks\Solid.Testing\Solid.Testing.Core\Solid.Testing.Core.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Solid.Http" Version="1.0.31" />
+    <PackageReference Include="Solid.Http" Version="2.0.7-RC" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Solid.Testing.Abstractions\Solid.Testing.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

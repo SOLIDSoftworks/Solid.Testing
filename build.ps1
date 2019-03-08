@@ -12,14 +12,16 @@ param(
     [string]$version = $Env:PackageVersion
 )
 
+# ./build.ps1 -nuget 'H:\nuget.exe' -msbuild 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\15.0\Bin\msbuild.exe' -srcPath . -configuration Release -version 1.1.1
+
 function Find-Projects {
     [CmdletBinding()]
     param(
         
     )
     process {
-        Write-Verbose "Finding all *.csproj files in $srcPath"
-        Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse -File
+        Write-Verbose "Finding all Solid.Testing.*.csproj files in $srcPath"
+        Get-ChildItem -Path $srcPath -Filter Solid.Testing.*.csproj -Recurse -File | Where { !$_.Name.Contains('.Tests') }
     }
 }
 

@@ -6,36 +6,74 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Solid.Http.Abstractions;
+using Solid.Testing.Exceptions;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Solid.Testing
 {
+    /// <summary>
+    /// Extensions for ISolidHttpRequest
+    /// </summary>
     public static class SolidHttpRequestExtensions
     {
-        public static Assertion ShouldRespondWith(this SolidHttpRequest request, HttpStatusCode statusCode)
+        /// <summary>
+        /// Performs an assertion against the http response message
+        /// </summary>
+        /// <param name="request">The Solid.Http request</param>
+        /// <param name="assert">The assertion action</param>
+        /// <returns>The fluent assertion</returns>
+        public static Assertion Should(this ISolidHttpRequest request, Action<HttpResponseMessage> assert)
+            => request.Should(response =>
+            {
+                assert(response);
+                return Task.CompletedTask;
+            });
+
+        /// <summary>
+        /// Performs an async assertion against the http response message
+        /// </summary>
+        /// <param name="request">The Solid.Http request</param>
+        /// <param name="assert">The async assertion action</param>
+        /// <returns>The fluent assertion</returns>
+        public static Assertion Should(this ISolidHttpRequest request, Func<HttpResponseMessage, Task> assert)
+        {
+            var assertion = new Assertion(request);
+            assertion.Request.OnResponse(async (provider, response) => await assert(response));
+            return assertion;
+        }
+
+        /// <summary>
+        /// Asserts the status code of the response
+        /// </summary>
+        /// <param name="request">The Solid.Http request</param>
+        /// <param name="statusCode">The expected status code</param>
+        /// <returns>The fluent assertion</returns>
+        public static Assertion ShouldRespondWith(this ISolidHttpRequest request, HttpStatusCode statusCode)
         {
             return request.ShouldRespondWith((int)statusCode);
         }
 
-        public static Assertion ShouldRespondWith(this SolidHttpRequest request, int statusCode)
+        /// <summary>
+        /// Asserts the status code of the response
+        /// </summary>
+        /// <param name="request">The Solid.Http request</param>
+        /// <param name="statusCode">The expected status code</param>
+        /// <returns>The fluent assertion</returns>
+        public static Assertion ShouldRespondWith(this ISolidHttpRequest request, int statusCode)
         {
-            var assertion = new Assertion(request);
-            assertion.Request.OnResponse += (sender, args) =>
-            {
-                var asserter = args.Services.GetService<IAsserter>();
-                asserter.AreEqual(statusCode, (int)args.Response.StatusCode, $"Expected {statusCode} status code. Got {args.Response.StatusCode} instead.");
-            };
-            return assertion;
+            return request.Should(response => response.AssertStatusCode(statusCode));
         }
 
-        public static Assertion ShouldRespondSuccessfully(this SolidHttpRequest request)
+        /// <summary>
+        /// Asserts that the status code of the response is successful (200-299)
+        /// </summary>
+        /// <param name="request">The Solid.Http request</param>
+        /// <returns>The fluent assertion</returns>
+        public static Assertion ShouldRespondSuccessfully(this ISolidHttpRequest request)
         {
-            var assertion = new Assertion(request);
-            assertion.Request.OnResponse += (sender, args) =>
-            {
-                var asserter = args.Services.GetService<IAsserter>();
-                asserter.IsTrue(args.Response.IsSuccessStatusCode, $"Expected successful status code. Got {args.Response.StatusCode} instead.");
-            };
-            return assertion;
+            return request.Should(response => response.AssertSuccessful());
         }
     }
 }

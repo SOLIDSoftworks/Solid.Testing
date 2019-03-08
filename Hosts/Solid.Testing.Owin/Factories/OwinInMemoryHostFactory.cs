@@ -8,12 +8,13 @@ using Solid.Testing.Models;
 using Microsoft.Owin.Hosting;
 using System.Net.Sockets;
 using System.Net;
+using Solid.Testing.Abstractions.Factories;
 
 namespace Solid.Testing.Extensions.Owin.Factories
 {
     internal class OwinInMemoryHostFactory : IInMemoryHostFactory
     {
-        public InMemoryHost CreateHost(Type startup)
+        public IInMemoryHost CreateHost(Type startup)
         {
             var listenerType = typeof(Microsoft.Owin.Host.HttpListener.OwinServerFactory);
             var port = GetFreeTcpPort();

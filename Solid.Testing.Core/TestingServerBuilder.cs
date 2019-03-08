@@ -3,55 +3,84 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Solid.Http;
 using Solid.Http.Abstractions;
 using Solid.Testing.Abstractions;
-using Solid.Testing.Services;
+using Solid.Testing.Abstractions.Factories;
 using System;
 using System.Linq;
+using System.Net.Http;
 
 namespace Solid.Testing
 {
+    /// <summary>
+    /// The testing server builder
+    /// </summary>
     public class TestingServerBuilder
     {
-        private IServiceCollection _services;
-        private IInMemoryHostFactory _hostFactory;
-        private ISolidHttpBuilder _httpBuilder;
+        private Action<IServiceCollection> _servicesAction = (_ => { });
+        private Action<ISolidHttpBuilder> _builderAction = (_ => { });
         private Type _startup;
-
-        public TestingServerBuilder()
+        
+        /// <summary>
+        /// Adds a host factory of the generic type
+        /// </summary>
+        /// <typeparam name="TFactory">The implementation of IInMemoryHostFactory</typeparam>
+        /// <returns>The testing server builder</returns>
+        public TestingServerBuilder AddHostFactory<TFactory>()
+            where TFactory : class, IInMemoryHostFactory
         {
-            _services = new ServiceCollection();
-            _httpBuilder = _services.AddSolidHttp();
+            AddTestingServices(services =>
+            {
+                var descriptor = services.FirstOrDefault(s => s.ServiceType == typeof(IInMemoryHostFactory));
+                if (descriptor != null)
+                    throw new InvalidOperationException($"Host factory ({descriptor.ServiceType.FullName}) has already been added.");
+                services.AddSingleton<IInMemoryHostFactory, TFactory>();
+            });
+            return this;
         }
 
+        /// <summary>
+        /// Adds a host factory of the generic type
+        /// </summary>
+        /// <param name="factory">An instance of IInMemoryHostFactory</param>
+        /// <returns>The testing server builder</returns>
         public TestingServerBuilder AddHostFactory(IInMemoryHostFactory factory)
         {
-            if (_hostFactory != null)
-                throw new InvalidOperationException($"Host factory ({_hostFactory.GetType().FullName}) has already been added.");
-            _hostFactory = factory;
+            AddTestingServices(services =>
+            {
+                var descriptor = services.FirstOrDefault(s => s.ServiceType == typeof(IInMemoryHostFactory));
+                if (descriptor != null)
+                    throw new InvalidOperationException($"Host factory ({descriptor.ServiceType.FullName}) has already been added.");
+                services.AddSingleton<IInMemoryHostFactory>(factory);
+            });
             return this;
         }
 
-        //public TestingServerBuilder AddAsserter(IAsserter asserter)
-        //{
-        //    return AddServices(s => s.AddSingleton<IAsserter>(asserter));
-        //}
-
-        //public TestingServerBuilder AddAsserter<TAsserter>()
-        //    where TAsserter : class, IAsserter
-        //{
-        //    return AddServices(s => s.AddSingleton<IAsserter, TAsserter>());
-        //}
-
-        public TestingServerBuilder AddServices(Action<IServiceCollection> action)
+        /// <summary>
+        /// Adds services to the testing server service provider
+        /// <para>These are NOT services that are used internally by the in memory host</para>
+        /// </summary>
+        /// <param name="action">Add services action</param>
+        /// <returns>The testing server builder</returns>
+        public TestingServerBuilder AddTestingServices(Action<IServiceCollection> action)
         {
-            action(_services);
+            _servicesAction += action;
             return this;
         }
 
+        /// <summary>
+        /// Adds the startup class
+        /// </summary>
+        /// <typeparam name="TStartup">The startup class type</typeparam>
+        /// <returns>The testing server builder</returns>
         public TestingServerBuilder AddStartup<TStartup>()
         {
             return AddStartup(typeof(TStartup));
         }
 
+        /// <summary>
+        /// Adds the startup type
+        /// </summary>
+        /// <param name="type">The startup class type</param>
+        /// <returns>The testing server builder</returns>
         public TestingServerBuilder AddStartup(Type type)
         {
             if (_startup != null)
@@ -60,22 +89,35 @@ namespace Solid.Testing
             return this;
         }
 
-        public TestingServerBuilder AddSolidHttpOptions(Action<ISolidHttpOptions> action)
+        /// <summary>
+        /// Configures the Solid.Http http client used to communicate with the in memory host
+        /// </summary>
+        /// <param name="action">The configuration action</param>
+        /// <returns>The testing server builder</returns>
+        public TestingServerBuilder AddSolidHttpOptions(Action<ISolidHttpBuilder> action)
         {
-            _httpBuilder.AddSolidHttpOptions(action);
+            _builderAction += action;
             return this;
         }
 
+        /// <summary>
+        /// Builds the TestingServer
+        /// </summary>
+        /// <returns>The TestingServer</returns>
         public TestingServer Build()
         {
-            _services.TryAddSingleton<IAsserter, BasicAsserter>();
-            if (_hostFactory == null)
+            var services = new ServiceCollection();
+            _servicesAction(services);   
+            services.AddSolidHttp(b => _builderAction(b));
+
+            var provider = services.BuildServiceProvider();
+            var factory = provider.GetService<IInMemoryHostFactory>();
+            if (factory == null)
                 throw new InvalidOperationException("Cannot build testing server without an InMemoryHostFactory");
             if (_startup == null)
                 throw new InvalidOperationException("Cannot build testing server without Startup class");
 
-            var provider = _services.BuildServiceProvider();
-            var host = _hostFactory.CreateHost(_startup);
+            var host = factory.CreateHost(_startup);
             return new TestingServer(host, provider);
         }
     }
