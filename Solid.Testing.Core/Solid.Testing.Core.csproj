@@ -6,8 +6,16 @@
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>H:\github\SolidSoftworks\Solid.Testing\Solid.Testing.Core\Solid.Testing.Core.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>H:\github\SolidSoftworks\Solid.Testing\Solid.Testing.Core\Solid.Testing.Core.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Solid.Http" Version="2.0.7-RC"/>
+    <PackageReference Include="Solid.Http" Version="2.0.7-RC" />
   </ItemGroup>
 
   <ItemGroup>

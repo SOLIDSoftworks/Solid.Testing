@@ -9,6 +9,9 @@ using Solid.Testing.Abstractions;
 
 namespace Solid.Testing
 {
+    /// <summary>
+    /// The testing server
+    /// </summary>
     public class TestingServer : IDisposable
     {
         private IInMemoryHost _host;
@@ -22,10 +25,25 @@ namespace Solid.Testing
             _root = provider;
         }
 
+        /// <summary>
+        /// The base address of the testing server
+        /// </summary>
         public Uri BaseAddress => _host.BaseAddress;
+
+        /// <summary>
+        /// The service provider for the server
+        /// <para>This is NOT the service provider that the in memory host uses internally</para>
+        /// </summary>
         public IServiceProvider Provider => CreateScope().ServiceProvider;
+
+        /// <summary>
+        /// Solid.Http http client for communication to the in memory host
+        /// </summary>
         public ISolidHttpClient Client => Provider.GetService<ISolidHttpClientFactory>().CreateWithBaseAddress(_host.BaseAddress);
 
+        /// <summary>
+        /// Disposes the service scopes created for this testing server
+        /// </summary>
         public void Dispose()
         {
             foreach (var scope in _scopes)

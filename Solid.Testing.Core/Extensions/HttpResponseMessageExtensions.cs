@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Solid.Testing.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -23,6 +24,18 @@ namespace Solid.Testing
                     values = response.Content.Headers.GetValues(name);
             }
             return values;
+        }
+
+        public static void AssertSuccessful(this HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode)
+                throw new SolidTestingAssertionException($"Expected successful status code. Got {response.StatusCode} instead.");
+        }
+
+        public static void AssertStatusCode(this HttpResponseMessage response, int statusCode)
+        {
+            if (statusCode != (int)response.StatusCode)
+                throw new SolidTestingAssertionException($"Expected {statusCode} status code. Got {response.StatusCode} instead.");
         }
     }
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Solid.Testing.Abstractions</name>
+    </assembly>
+    <members>
+        <member name="T:Solid.Testing.Abstractions.Factories.IInMemoryHostFactory">
+            <summary>
+            A factory to create in memory hosts
+            </summary>
+        </member>
+        <member name="M:Solid.Testing.Abstractions.Factories.IInMemoryHostFactory.CreateHost(System.Type)">
+            <summary>
+            Create a host with a startup type
+            </summary>
+            <param name="startup"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Solid.Testing.Abstractions.IInMemoryHost">
+            <summary>
+            An in memory host to be used in tests
+            </summary>
+        </member>
+        <member name="P:Solid.Testing.Abstractions.IInMemoryHost.BaseAddress">
+            <summary>
+            The base address of the in memory host
+            </summary>
+        </member>
+    </members>
+</doc>

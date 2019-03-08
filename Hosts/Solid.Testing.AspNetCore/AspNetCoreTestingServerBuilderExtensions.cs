@@ -20,13 +20,39 @@ namespace Solid.Testing
     {
         private static readonly string _defaultHostName = "localhost";
 
+        /// <summary>
+        /// Adds the host factory for asp net core
+        /// </summary>
+        /// <param name="builder">The testing server builder</param>
+        /// <returns>The testing server builder</returns>
         public static TestingServerBuilder AddAspNetCoreHostFactory(this TestingServerBuilder builder)
             => builder.AddAspNetCoreHostFactory(_defaultHostName);
+
+        /// <summary>
+        /// Adds the host factory for asp net core
+        /// </summary>
+        /// <param name="builder">The testing server builder</param>
+        /// <param name="hostname">The hostname for the in memory host</param>
+        /// <returns>The testing server builder</returns>
         public static TestingServerBuilder AddAspNetCoreHostFactory(this TestingServerBuilder builder, string hostname)
             => builder.AddAspNetCoreHostFactory(hostname, _ => { });
+
+        /// <summary>
+        /// Adds the host factory for asp net core
+        /// </summary>
+        /// <param name="builder">The testing server builder</param>
+        /// <param name="configure">Configuration delegate for the web host</param>
+        /// <returns>The testing server builder</returns>
         public static TestingServerBuilder AddAspNetCoreHostFactory(this TestingServerBuilder builder, Action<IWebHostBuilder> configure)
             => builder.AddAspNetCoreHostFactory(_defaultHostName, configure);
 
+        /// <summary>
+        /// Adds the host factory for asp net core
+        /// </summary>
+        /// <param name="builder">The testing server builder</param>
+        /// <param name="hostname">The hostname for the in memory host</param>
+        /// <param name="configure">Configuration delegate for the web host</param>
+        /// <returns>The testing server builder</returns>
         public static TestingServerBuilder AddAspNetCoreHostFactory(this TestingServerBuilder builder, string hostname, Action<IWebHostBuilder> configure)
         {
             var options = new UrlOptions

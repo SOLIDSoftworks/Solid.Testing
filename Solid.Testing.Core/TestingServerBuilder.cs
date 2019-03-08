@@ -4,20 +4,26 @@ using Solid.Http;
 using Solid.Http.Abstractions;
 using Solid.Testing.Abstractions;
 using Solid.Testing.Abstractions.Factories;
-using Solid.Testing.Services;
 using System;
 using System.Linq;
 using System.Net.Http;
 
 namespace Solid.Testing
 {
+    /// <summary>
+    /// The testing server builder
+    /// </summary>
     public class TestingServerBuilder
     {
-    //    private IInMemoryHostFactory _hostFactory;
         private Action<IServiceCollection> _servicesAction = (_ => { });
         private Action<ISolidHttpBuilder> _builderAction = (_ => { });
         private Type _startup;
         
+        /// <summary>
+        /// Adds a host factory of the generic type
+        /// </summary>
+        /// <typeparam name="TFactory">The implementation of IInMemoryHostFactory</typeparam>
+        /// <returns>The testing server builder</returns>
         public TestingServerBuilder AddHostFactory<TFactory>()
             where TFactory : class, IInMemoryHostFactory
         {
@@ -31,6 +37,11 @@ namespace Solid.Testing
             return this;
         }
 
+        /// <summary>
+        /// Adds a host factory of the generic type
+        /// </summary>
+        /// <param name="factory">An instance of IInMemoryHostFactory</param>
+        /// <returns>The testing server builder</returns>
         public TestingServerBuilder AddHostFactory(IInMemoryHostFactory factory)
         {
             AddTestingServices(services =>
@@ -43,28 +54,33 @@ namespace Solid.Testing
             return this;
         }
 
-        //public TestingServerBuilder AddAsserter(IAsserter asserter)
-        //{
-        //    return AddServices(s => s.AddSingleton<IAsserter>(asserter));
-        //}
-
-        //public TestingServerBuilder AddAsserter<TAsserter>()
-        //    where TAsserter : class, IAsserter
-        //{
-        //    return AddServices(s => s.AddSingleton<IAsserter, TAsserter>());
-        //}
-
+        /// <summary>
+        /// Adds services to the testing server service provider
+        /// <para>These are NOT services that are used internally by the in memory host</para>
+        /// </summary>
+        /// <param name="action">Add services action</param>
+        /// <returns>The testing server builder</returns>
         public TestingServerBuilder AddTestingServices(Action<IServiceCollection> action)
         {
             _servicesAction += action;
             return this;
         }
 
+        /// <summary>
+        /// Adds the startup class
+        /// </summary>
+        /// <typeparam name="TStartup">The startup class type</typeparam>
+        /// <returns>The testing server builder</returns>
         public TestingServerBuilder AddStartup<TStartup>()
         {
             return AddStartup(typeof(TStartup));
         }
 
+        /// <summary>
+        /// Adds the startup type
+        /// </summary>
+        /// <param name="type">The startup class type</param>
+        /// <returns>The testing server builder</returns>
         public TestingServerBuilder AddStartup(Type type)
         {
             if (_startup != null)
@@ -73,19 +89,27 @@ namespace Solid.Testing
             return this;
         }
 
+        /// <summary>
+        /// Configures the Solid.Http http client used to communicate with the in memory host
+        /// </summary>
+        /// <param name="action">The configuration action</param>
+        /// <returns>The testing server builder</returns>
         public TestingServerBuilder AddSolidHttpOptions(Action<ISolidHttpBuilder> action)
         {
             _builderAction += action;
             return this;
         }
 
+        /// <summary>
+        /// Builds the TestingServer
+        /// </summary>
+        /// <returns>The TestingServer</returns>
         public TestingServer Build()
         {
             var services = new ServiceCollection();
             _servicesAction(services);   
             services.AddSolidHttp(b => _builderAction(b));
 
-            services.TryAddSingleton<IAsserter, BasicAsserter>();
             var provider = services.BuildServiceProvider();
             var factory = provider.GetService<IInMemoryHostFactory>();
             if (factory == null)

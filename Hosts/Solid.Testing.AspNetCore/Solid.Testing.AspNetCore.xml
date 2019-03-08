@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Solid.Testing.AspNetCore</name>
+    </assembly>
+    <members>
+        <member name="T:Solid.Testing.AspNetCore.Abstractions.Factories.IWebHostFactory">
+            <summary>
+            The asp net core web host factory
+            </summary>
+        </member>
+        <member name="M:Solid.Testing.AspNetCore.Abstractions.Factories.IWebHostFactory.CreateWebHost(System.Type,System.String)">
+            <summary>
+            Create an asp net core web host using a startup class and a hostname
+            </summary>
+            <param name="startup">The startup class type</param>
+            <param name="hostname">The host name</param>
+            <returns>An asp net core web host</returns>
+        </member>
+        <member name="T:Solid.Testing.AspNetCore.Abstractions.Factories.WebHostFactory">
+            <summary>
+            Abstract asp net core web host factory
+            </summary>
+        </member>
+        <member name="P:Solid.Testing.AspNetCore.Abstractions.Factories.WebHostFactory.Provider">
+            <summary>
+            The web host options provider
+            </summary>
+        </member>
+        <member name="M:Solid.Testing.AspNetCore.Abstractions.Factories.WebHostFactory.CreateWebHost(System.Type,System.String)">
+            <summary>
+            Create an asp net core web host using a startup class and a hostname
+            </summary>
+            <param name="startup">The startup class type</param>
+            <param name="hostname">The host name</param>
+            <returns>An asp net core web host</returns>
+        </member>
+        <member name="M:Solid.Testing.AspNetCore.Abstractions.Factories.WebHostFactory.InitializeWebHostBuilder(System.Type,System.String)">
+            <summary>
+            Initialized an asp net core web host builder for a startup class and a hostname
+            </summary>
+            <param name="startup">The startup class type</param>
+            <param name="hostname">The host name</param>
+            <returns>An asp net core web host</returns>
+        </member>
+        <member name="M:Solid.Testing.AspNetCore.Abstractions.Factories.WebHostFactory.GenerateApplicationConfiguration(Microsoft.Extensions.Configuration.IConfigurationBuilder)">
+            <summary>
+            Generates the application configuration
+            </summary>
+            <param name="builder">A configuration builder</param>
+            <returns>The application configuration for the web host</returns>
+        </member>
+        <member name="M:Solid.Testing.AspNetCore.Abstractions.Factories.WebHostFactory.GetAppSettingsPaths">
+            <summary>
+            Gets the path to all relative appsettings.json files 
+            </summary>
+            <returns>An enumerable of appsettings.json paths</returns>
+        </member>
+        <member name="M:Solid.Testing.AspNetCore.Abstractions.Factories.WebHostFactory.GetProjectFilePaths">
+            <summary>
+            Gets the path to all relative csproj files
+            </summary>
+            <returns>An enumerable of csproj paths</returns>
+        </member>
+        <member name="M:Solid.Testing.AspNetCore.Abstractions.Factories.WebHostFactory.GetProjectReferences(System.String)">
+            <summary>
+            Reads references from a project file
+            <para>This only supports the new project types (vs2017+)</para>
+            </summary>
+            <param name="project">The path to a csproj project file</param>
+            <returns>Gets an enumerable of the project references from the csproj file</returns>
+        </member>
+        <member name="M:Solid.Testing.AspNetCore.Abstractions.Factories.WebHostFactory.ContainsProject(System.String)">
+            <summary>
+            Recursively checks whether a path contains an csproj files
+            </summary>
+            <param name="path">The path to check</param>
+            <returns>A boolean value indicating whether a csproj file was found</returns>
+        </member>
+        <member name="T:Solid.Testing.AspNetCore.Abstractions.Providers.IWebHostOptionsProvider">
+            <summary>
+            The IWebHostBuilder configuration delegate provider
+            </summary>
+        </member>
+        <member name="P:Solid.Testing.AspNetCore.Abstractions.Providers.IWebHostOptionsProvider.Configure">
+            <summary>
+            The configuration delegate
+            </summary>
+        </member>
+        <member name="M:Solid.Testing.AspNetCoreTestingServerBuilderExtensions.AddAspNetCoreHostFactory(Solid.Testing.TestingServerBuilder)">
+            <summary>
+            Adds the host factory for asp net core
+            </summary>
+            <param name="builder">The testing server builder</param>
+            <returns>The testing server builder</returns>
+        </member>
+        <member name="M:Solid.Testing.AspNetCoreTestingServerBuilderExtensions.AddAspNetCoreHostFactory(Solid.Testing.TestingServerBuilder,System.String)">
+            <summary>
+            Adds the host factory for asp net core
+            </summary>
+            <param name="builder">The testing server builder</param>
+            <param name="hostname">The hostname for the in memory host</param>
+            <returns>The testing server builder</returns>
+        </member>
+        <member name="M:Solid.Testing.AspNetCoreTestingServerBuilderExtensions.AddAspNetCoreHostFactory(Solid.Testing.TestingServerBuilder,System.Action{Microsoft.AspNetCore.Hosting.IWebHostBuilder})">
+            <summary>
+            Adds the host factory for asp net core
+            </summary>
+            <param name="builder">The testing server builder</param>
+            <param name="configure">Configuration delegate for the web host</param>
+            <returns>The testing server builder</returns>
+        </member>
+        <member name="M:Solid.Testing.AspNetCoreTestingServerBuilderExtensions.AddAspNetCoreHostFactory(Solid.Testing.TestingServerBuilder,System.String,System.Action{Microsoft.AspNetCore.Hosting.IWebHostBuilder})">
+            <summary>
+            Adds the host factory for asp net core
+            </summary>
+            <param name="builder">The testing server builder</param>
+            <param name="hostname">The hostname for the in memory host</param>
+            <param name="configure">Configuration delegate for the web host</param>
+            <returns>The testing server builder</returns>
+        </member>
+    </members>
+</doc>

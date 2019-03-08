@@ -5,6 +5,14 @@
     <RootNamespace>Solid.Testing</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>H:\github\SolidSoftworks\Solid.Testing\Solid.Testing.Abstractions\Solid.Testing.Abstractions.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>H:\github\SolidSoftworks\Solid.Testing\Solid.Testing.Abstractions\Solid.Testing.Abstractions.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <Folder Include="Abstractions\Providers\" />
   </ItemGroup>

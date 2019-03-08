@@ -7,6 +7,10 @@
   <PropertyGroup Condition="'$(TargetFramework)' == 'net472'">
     <TargetPlatform>x64</TargetPlatform>
   </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|AnyCPU'">
+    <DocumentationFile>H:\github\SolidSoftworks\Solid.Testing\Hosts\Solid.Testing.AspNetCore.Extensions.Https\Solid.Testing.AspNetCore.Extensions.Https.xml</DocumentationFile>
+  </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <Reference Include="System.Net.Http" />
