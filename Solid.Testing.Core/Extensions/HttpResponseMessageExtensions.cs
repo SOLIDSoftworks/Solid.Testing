@@ -28,7 +28,7 @@ namespace Solid.Testing
 
         public static void AssertSuccessful(this HttpResponseMessage response)
         {
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
                 throw new SolidTestingAssertionException($"Expected successful status code. Got {response.StatusCode} instead.");
         }
 
