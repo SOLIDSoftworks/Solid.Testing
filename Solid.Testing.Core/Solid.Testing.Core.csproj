@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Solid.Http" Version="2.0.7-RC" />
+    <PackageReference Include="Solid.Http" Version="2.0.10-RC" />
   </ItemGroup>
 
   <ItemGroup>

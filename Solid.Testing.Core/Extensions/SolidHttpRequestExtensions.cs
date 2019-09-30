@@ -40,7 +40,7 @@ namespace Solid.Testing
         public static Assertion Should(this ISolidHttpRequest request, Func<HttpResponseMessage, Task> assert)
         {
             var assertion = new Assertion(request);
-            assertion.Request.OnResponse(async (provider, response) => await assert(response));
+            assertion.Request.OnResponse(async (_, response) => await assert(response));
             return assertion;
         }
 
