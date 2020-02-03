@@ -4,7 +4,6 @@
     <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <VersionPrefix></VersionPrefix>
-    <VersionSuffix></VersionSuffix>
     <AssemblyVersion></AssemblyVersion>
     <FileVersion></FileVersion>
     <InformationalVersion></InformationalVersion>

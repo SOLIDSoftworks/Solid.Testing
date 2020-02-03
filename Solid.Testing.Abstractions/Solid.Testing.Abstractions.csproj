@@ -5,7 +5,6 @@
     <RootNamespace>Solid.Testing</RootNamespace>
     <IsPackable>true</IsPackable>
     <VersionPrefix></VersionPrefix>
-    <VersionSuffix></VersionSuffix>
     <AssemblyVersion></AssemblyVersion>
     <FileVersion></FileVersion>
     <InformationalVersion></InformationalVersion>

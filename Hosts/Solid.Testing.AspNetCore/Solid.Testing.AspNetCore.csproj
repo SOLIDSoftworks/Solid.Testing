@@ -4,7 +4,6 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <VersionPrefix></VersionPrefix>
-    <VersionSuffix></VersionSuffix>
     <AssemblyVersion></AssemblyVersion>
     <FileVersion></FileVersion>
     <InformationalVersion></InformationalVersion>
