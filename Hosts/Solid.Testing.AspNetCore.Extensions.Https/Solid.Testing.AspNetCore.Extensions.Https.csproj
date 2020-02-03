@@ -2,6 +2,14 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
+    <IsPackable>true</IsPackable>
+    <Version></Version>
+    <VersionPrefix></VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+    <AssemblyVersion></AssemblyVersion>
+    <PackageVersion></PackageVersion>
+    <FileVersion></FileVersion>
+    <InformationalVersion></InformationalVersion>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(TargetFramework)' == 'net472'">
