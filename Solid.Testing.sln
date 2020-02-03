@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{516915BB-AD00-46B6-ADE2-0960B04FE61E}"
 	ProjectSection(SolutionItems) = preProject
@@ -24,13 +24,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C9D75022
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Solid.Testing.AspNetCore.Extensions.Https", "Hosts\Solid.Testing.AspNetCore.Extensions.Https\Solid.Testing.AspNetCore.Extensions.Https.csproj", "{3BD2D6D3-E5E3-4377-9870-8F820FC6B36A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solid.Testing.AspNetCore.Extensions.Https.Tests (netcoreapp2.0)", "Tests\Solid.Testing.AspNetCore.Extensions.Https.Tests (netcoreapp2.0)\Solid.Testing.AspNetCore.Extensions.Https.Tests (netcoreapp2.0).csproj", "{2BCFAC0A-65A8-4145-837E-25F37AF7986C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Solid.Testing.AspNetCore.Extensions.Https.Tests (netcoreapp3.1)", "Tests\Solid.Testing.AspNetCore.Extensions.Https.Tests (netcoreapp2.0)\Solid.Testing.AspNetCore.Extensions.Https.Tests (netcoreapp3.1).csproj", "{2BCFAC0A-65A8-4145-837E-25F37AF7986C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solid.Testing.AspNetCore.Extensions.Https.Tests (net472)", "Tests\Solid.Testing.AspNetCore.Extensions.Https.Tests (net472)\Solid.Testing.AspNetCore.Extensions.Https.Tests (net472).csproj", "{5C8F0837-DD43-4991-9329-7CE6C8B62B4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Solid.Testing.AspNetCore.Extensions.Https.Tests (net472)", "Tests\Solid.Testing.AspNetCore.Extensions.Https.Tests (net472)\Solid.Testing.AspNetCore.Extensions.Https.Tests (net472).csproj", "{5C8F0837-DD43-4991-9329-7CE6C8B62B4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solid.Testing.AspNetCore.Tests", "Tests\Solid.Testing.AspNetCore.Tests\Solid.Testing.AspNetCore.Tests.csproj", "{BD57AF41-5D2D-41A1-860E-29FE1812A399}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Solid.Testing.AspNetCore.Tests", "Tests\Solid.Testing.AspNetCore.Tests\Solid.Testing.AspNetCore.Tests.csproj", "{BD57AF41-5D2D-41A1-860E-29FE1812A399}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{6523B12B-1055-4973-AB3E-7BB443960A16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{6523B12B-1055-4973-AB3E-7BB443960A16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
