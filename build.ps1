@@ -1,180 +1,21 @@
 [CmdletBinding()]
 param(
-    [Parameter()]
-    [string]$nuget = $Env:NuGet,
-    [Parameter()]
-    [string]$msbuild = $Env:MsBuildExe,
+    #[Parameter()]
+    #[string]$nuget = $Env:NuGet,
+    #[Parameter()]
+    #[string]$msbuild = $Env:MsBuildExe,
     [Parameter()]
     [string]$srcPath = $Env:SourcesPath,
     [Parameter()]
-    [string]$configuration = $Env:Configuration,
-    [Parameter()]
-    [string]$version = $Env:PackageVersion
+    [string]$configuration = $Env:Configuration
+    #,
+    #[Parameter()]
+    #[string]$version = $Env:PackageVersion
 )
 
-# ./build.ps1 -nuget 'H:\nuget.exe' -msbuild 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\15.0\Bin\msbuild.exe' -srcPath . -configuration Release -version 1.1.1
+# ./build.ps1 -srcPath . -configuration Release 
 
-function Find-Projects {
-    [CmdletBinding()]
-    param(
-        
-    )
-    process {
-        Write-Verbose "Finding all Solid.Testing.*.csproj files in $srcPath"
-        Get-ChildItem -Path $srcPath -Filter Solid.Testing.*.csproj -Recurse -File | Where { !$_.Name.Contains('.Tests') }
-    }
-}
-
-function Test-LegacyProject {
-    [CmdletBinding()]
-    param(    
-        [Parameter(Mandatory=$true)]
-        [string] $project,
-        [Parameter(Mandatory=$true)]
-        [xml] $xml
-    )
-    process {
-        !$xml.Project.HasAttribute("Sdk") -or ($xml.Project.Sdk -ne 'Microsoft.Net.Sdk')
-    }
-}
-
-function Invoke-MsBuildPack {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$true)]
-        [string] $project,
-        [Parameter(Mandatory=$true)]
-        [xml] $xml
-    )
-    process {
-        Write-Verbose "Invoking msbuild /t:restore for $project"
-        . $msbuild $project /nologo /t:restore /verbosity:minimal
-        Write-Verbose "Invoking msbuild /t:rebuild /t:pack for $project"
-        . $msbuild $project /nologo /t:rebuild /t:pack /verbosity:minimal "/property:Configuration=$configuration"
-        if($LASTEXITCODE) {
-            Write-Error "Build failed for $project"
-            exit 1
-        }
-    }
-}
-
-function Invoke-MsBuild {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$true)]
-        [string] $project,
-        [Parameter(Mandatory=$true)]
-        [xml] $xml
-    )
-    process {
-        Write-Verbose "Invoking msbuild for $project"
-        . $msbuild $project /nologo /verbosity:minimal "/property:Configuration=$configuration"
-        if($LASTEXITCODE) {
-            Write-Error "Build failed for $project"
-            exit 1
-        }
-    }
-}
-
-function Update-Nuspec {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$true)]
-        [string] $path,
-        [Parameter(Mandatory=$true)]
-        [string] $assembly,
-        [Parameter(Mandatory=$true)]
-        [string] $id
-    )
-    process {
-        $directory = [IO.Path]::GetDirectoryName($path)
-        $new = [IO.Path]::Combine($directory, "$([Guid]::NewGuid()).nuspec")
-        $xml = [xml](Get-Content $path)
-
-        $xml.package.metadata.id = $id
-        $xml.package.metadata.version = $version
-        $xml.package.metadata.dependencies.dependency | Where-Object { $_.id.StartsWith('Solid.Testing.') } | ForEach-Object { $_.version = $version }
-
-        $files = $xml.CreateElement('files', $xml.package.xmlns)
-        $file = $xml.CreateElement('file', $xml.package.xmlns)
-        $file.SetAttribute('src', "bin/$configuration/$assembly.dll") | Out-Null
-        $file.SetAttribute('target', 'lib/net461') | Out-Null
-
-        $files.AppendChild($file)  | Out-Null       
-
-        $xml.package.AppendChild($files) | Out-Null
-
-        $xml.Save($new) | Out-Null
-
-        $new
-    }
-}
-
-function Invoke-NugetRestore {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$true)]
-        [string] $project,
-        [Parameter(Mandatory=$true)]
-        [xml] $xml
-    )
-    process {
-        Write-Verbose "Invoking nuget restore for $project"
-        . $nuget restore $project
-        if($LASTEXITCODE) {
-            Write-Error "Restore failed for $project"
-            exit 1
-        }
-    }
-}
-
-function Invoke-NugetPack {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$true)]
-        [string] $project,
-        [Parameter(Mandatory=$true)]
-        [xml] $xml
-    )
-    begin {
-        $path = $project
-    }
-    process {
-        $name = [IO.Path]::GetFileNameWithoutExtension($project)
-        $directory = [IO.Path]::GetDirectoryName($project)
-        Write-Verbose "Checking for *.nuspec in $directory"
-        $nuspec = Get-ChildItem -Path $directory -Filter *.nuspec 
-        
-        if($nuspec) {
-            $assemblyName = $xml.Project.PropertyGroup.AssemblyName | Where-Object { $_ }
-            $path = Update-Nuspec -path $nuspec.FullName -id $name -assembly $assemblyName
-        }
-
-        Write-Verbose "Invoking nuget pack for $path"
-        . $nuget pack $path
-        if($LASTEXITCODE) {
-            Write-Error "Pack failed for $project"
-            exit 1
-        }
-    }
-}
-
-#$artifacts = [IO.Path]::Combine($srcPath, 'artifacts')
-#if(!(Test-Path $artifacts)) {
-#    Write-Verbose "Creating folder: $artifacts"
-#    New-Item -Path $artifacts -ItemType directory | Out-Null
-#}
-
-$projects = Find-Projects
-foreach($project in $projects) {
-    $path = $project.FullName
-    $xml = [xml](Get-Content -Path $path)
-    if(Test-LegacyProject -project $path -xml $xml) {
-        Invoke-NugetRestore -project $path -xml $xml
-        Invoke-MsBuild -project $path -xml $xml
-        Invoke-NugetPack -project $path -xml $xml
-    }
-    else {
-        Invoke-MsBuildPack -project $path -xml $xml 
-    }
-}
+dotnet restore $srcPath
+dotnet build $srcPath --no-restore --configuration $configuration
+dotnet test $srcPath --no-restore --no-build --configuration $configuration
+dotnet pack $srcPath --no-restore --no-build --configuration $configuration -o $srcPath/pack
