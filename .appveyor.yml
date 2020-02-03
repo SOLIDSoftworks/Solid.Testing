@@ -1,0 +1,11 @@
+﻿version: '2.0.{build}'
+build_script:
+  - ps: build.ps1 -srcPath . -configuration Release
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
