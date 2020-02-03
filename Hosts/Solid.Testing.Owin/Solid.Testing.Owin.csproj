@@ -3,11 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <IsPackable>true</IsPackable>
-    <Version></Version>
     <VersionPrefix></VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <AssemblyVersion></AssemblyVersion>
-    <PackageVersion></PackageVersion>
     <FileVersion></FileVersion>
     <InformationalVersion></InformationalVersion>
   </PropertyGroup>
