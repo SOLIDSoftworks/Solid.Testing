@@ -10,4 +10,4 @@ Solid.Testing is a library used for integration testing and system testing of we
 * [Solid.Testing.Abstractions](https://www.nuget.org/packages/Solid.Testing.Abstractions) (netstandard2.0)
 
 ## Usage
-Read how to use this library in [the wiki](https://github.com/SOLIDSoftworks/Solid.Testing/wiki) or on [our blog](https://solidsoft.works/tag/solid-testing/).
+Read how to use this library in [the wiki](https://github.com/SOLIDSoftworks/Solid.Testing/wiki) or on [our blog](https://solidsoftworks.io).
