@@ -24,7 +24,7 @@ namespace Solid.Testing.AspNetCore.Tests
         [Fact]
         public async Task ShouldReadJsonConfigFromApplicationFolder()
         {
-            var response = await _server.Client.GetAsync("ShouldReadJsonConfigFromApplicationFolder");
+            var response = await _server.GetAsync("ShouldReadJsonConfigFromApplicationFolder");
             var text = await response.Content.ReadAsStringAsync();
             Assert.Equal("external", text);
         }
@@ -32,7 +32,7 @@ namespace Solid.Testing.AspNetCore.Tests
         [Fact]
         public async Task ShouldReadJsonConfigFromTestFolder()
         {
-            var response = await _server.Client.GetAsync("ShouldReadJsonConfigFromTestFolder");
+            var response = await _server.GetAsync("ShouldReadJsonConfigFromTestFolder");
             var text = await response.Content.ReadAsStringAsync();
             Assert.Equal("overridden", text);
         }
@@ -46,7 +46,6 @@ namespace Solid.Testing.AspNetCore.Tests
             var assertion2 = new Action<HttpResponseMessage>(_ => asserted2 = true);
 
             var response = await _server
-                .Client
                 .GetAsync("ShouldReadJsonConfigFromTestFolder")
                 .Should(assertion1)
                 .Should(assertion2)
@@ -65,7 +64,6 @@ namespace Solid.Testing.AspNetCore.Tests
             try
             {
                 await _server
-                    .Client
                     .GetAsync("ShouldReadJsonConfigFromTestFolder")
                     .Should(_ => Assert.True(false))
                     .Should(assertion)

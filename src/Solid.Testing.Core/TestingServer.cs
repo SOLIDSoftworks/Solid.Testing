@@ -6,17 +6,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Solid.Testing.Models;
 using Solid.Testing.Abstractions;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Threading;
 
 namespace Solid.Http
 {
     /// <summary>
     /// The testing server
     /// </summary>
-    public class TestingServer : IDisposable
+    public class TestingServer : ISolidHttpClient, IDisposable
     {
         private IInMemoryHost _host;
         private ServiceProvider _root;
         private List<IServiceScope> _scopes;
+        private ISolidHttpClient _client;
 
         internal TestingServer(IInMemoryHost host, ServiceProvider provider)
         {
@@ -36,10 +39,18 @@ namespace Solid.Http
         /// </summary>
         public IServiceProvider Provider => CreateScope().ServiceProvider;
 
-        /// <summary>
-        /// Solid.Http http client for communication to the in memory host
-        /// </summary>
-        public ISolidHttpClient Client => Provider.GetService<ISolidHttpClientFactory>().CreateWithBaseAddress(_host.BaseAddress);
+        [Obsolete("The TestingServer is now it's own client")]
+        public ISolidHttpClient Client => GetInnerClient();
+
+        private ISolidHttpClient GetInnerClient()
+        {
+            if (_client == null)
+            {
+                _client = Provider.GetService<ISolidHttpClientFactory>().CreateWithBaseAddress(BaseAddress);
+                _client.OnRequestCreated(request => request.OnHttpResponse(_ => _client = null));
+            }
+            return _client;            
+        }
 
         /// <summary>
         /// Disposes the service scopes created for this testing server
@@ -56,5 +67,13 @@ namespace Solid.Http
             _scopes.Add(scope);
             return scope;
         }
+
+        Uri ISolidHttpClient.BaseAddress { get => this.BaseAddress; set => throw new NotImplementedException(); }
+
+        ISolidHttpClient ISolidHttpClient.OnRequestCreated(Action<IServiceProvider, ISolidHttpRequest> handler)
+            => GetInnerClient().OnRequestCreated(handler);
+
+        ISolidHttpRequest ISolidHttpClient.PerformRequestAsync(HttpMethod method, Uri url, CancellationToken cancellationToken = default)
+            => GetInnerClient().PerformRequestAsync(method, url, cancellationToken);
     }
 }

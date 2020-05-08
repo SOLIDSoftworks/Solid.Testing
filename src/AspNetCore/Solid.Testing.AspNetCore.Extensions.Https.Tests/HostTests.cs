@@ -20,7 +20,7 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Tests
         {
             using (var server = BuildServer())
             {
-                var response = await server.Client.GetAsync("/");
+                var response = await server.GetAsync("/");
                 var text = await response.Content.ReadAsStringAsync();
                 var https = bool.Parse(text);
                 Assert.True(https);
