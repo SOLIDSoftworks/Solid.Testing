@@ -1,0 +1,325 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Solid.Testing.Core</name>
+    </assembly>
+    <members>
+        <member name="T:Solid.Testing.Abstractions.Factories.IInMemoryHostFactory">
+            <summary>
+            A factory to create in memory hosts
+            </summary>
+        </member>
+        <member name="M:Solid.Testing.Abstractions.Factories.IInMemoryHostFactory.CreateHost(System.Type)">
+            <summary>
+            Create a host with a startup type
+            </summary>
+            <param name="startup"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Solid.Testing.Abstractions.IInMemoryHost">
+            <summary>
+            An in memory host to be used in tests
+            </summary>
+        </member>
+        <member name="P:Solid.Testing.Abstractions.IInMemoryHost.BaseAddress">
+            <summary>
+            The base address of the in memory host
+            </summary>
+        </member>
+        <member name="T:Solid.Testing.AssertionExtensions">
+            <summary>
+            Assertion extensions
+            </summary>
+        </member>
+        <member name="M:Solid.Testing.AssertionExtensions.Should(Solid.Testing.Models.Assertion,System.Action{System.Net.Http.HttpResponseMessage})">
+            <summary>
+            Performs an assertion against the http response message
+            </summary>
+            <param name="assertion">The fluent assertion</param>
+            <param name="assert">The assertion action</param>
+            <returns>The fluent assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.AssertionExtensions.Should(Solid.Testing.Models.Assertion,System.Func{System.Net.Http.HttpResponseMessage,System.Threading.Tasks.Task})">
+            <summary>
+            Performs an async assertion against the http response message
+            </summary>
+            <param name="assertion">The fluent assertion</param>
+            <param name="assert">The async assertion action</param>
+            <returns>The fluent assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.AssertionExtensions.ShouldHaveResponseHeader(Solid.Testing.Models.Assertion,System.String)">
+            <summary>
+            Asserts that a header with the specifed name is in the response message
+            </summary>
+            <param name="assertion">The fluent assertion</param>
+            <param name="name">The name of the header</param>
+            <returns>A fluent header assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.AssertionExtensions.ShouldRespondWith(Solid.Testing.Models.Assertion,System.Net.HttpStatusCode)">
+            <summary>
+            Asserts the status code of the response
+            </summary>
+            <param name="assertion">The fluent assertion</param>
+            <param name="statusCode">The expected status code</param>
+            <returns>The fluent assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.AssertionExtensions.ShouldRespondWith(Solid.Testing.Models.Assertion,System.Int32)">
+            <summary>
+            Asserts the status code of the response
+            </summary>
+            <param name="assertion">The fluent assertion</param>
+            <param name="statusCode">The expected status code</param>
+            <returns>The fluent assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.AssertionExtensions.ShouldRespondSuccessfully(Solid.Testing.Models.Assertion)">
+            <summary>
+            Asserts that the status code of the response is successful (200-299)
+            </summary>
+            <param name="assertion">The fluent assertion</param>
+            <returns>The fluent assertion</returns>
+        </member>
+        <member name="T:Solid.Testing.HeaderAssertionExtensions">
+            <summary>
+            Header value assertion extensions
+            </summary>
+        </member>
+        <member name="M:Solid.Testing.HeaderAssertionExtensions.WithValue(Solid.Testing.Models.HeaderAssertion,System.String)">
+            <summary>
+            Asserts whether the header has a specified value
+            </summary>
+            <param name="assertion">The header assertion</param>
+            <param name="value">The header value</param>
+            <returns>A header assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.HeaderAssertionExtensions.WithValue(Solid.Testing.Models.HeaderAssertion,System.String,System.Collections.Generic.IEqualityComparer{System.String})">
+            <summary>
+            Asserts whether the header has a specified value
+            </summary>
+            <param name="assertion">The header assertion</param>
+            <param name="value">The header value</param>
+            <param name="comparer">An equality comparer to use for the header value</param>
+            <returns>A header assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.HeaderAssertionExtensions.WithValueStartingWith(Solid.Testing.Models.HeaderAssertion,System.String)">
+            <summary>
+            Asserts whether the header starts with a specified value
+            </summary>
+            <param name="assertion">The header assertion</param>
+            <param name="value">The value the header should start with</param>
+            <returns>A header assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.HeaderAssertionExtensions.WithValueStartingWith(Solid.Testing.Models.HeaderAssertion,System.String,System.StringComparison)">
+            <summary>
+            Asserts whether the header starts with a specified value
+            </summary>
+            <param name="assertion">The header assertion</param>
+            <param name="value">The value the header should start with</param>
+            <param name="comparison">A comparison to use for the header value</param>
+            <returns>A header assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.HeaderAssertionExtensions.WithValueEndingWith(Solid.Testing.Models.HeaderAssertion,System.String)">
+            <summary>
+            Asserts whether the header ends with a specified value
+            </summary>
+            <param name="assertion">The header assertion</param>
+            <param name="value">The value the header should end with</param>
+            <returns>A header assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.HeaderAssertionExtensions.WithValueEndingWith(Solid.Testing.Models.HeaderAssertion,System.String,System.StringComparison)">
+            <summary>
+            Asserts whether the header ends with a specified value
+            </summary>
+            <param name="assertion">The header assertion</param>
+            <param name="value">The value the header should end with</param>
+            <param name="comparison">A comparison to use for the header value</param>
+            <returns>A header assertion</returns>
+        </member>
+        <member name="T:Solid.Testing.SolidHttpRequestExtensions">
+            <summary>
+            Extensions for ISolidHttpRequest
+            </summary>
+        </member>
+        <member name="M:Solid.Testing.SolidHttpRequestExtensions.Should(Solid.Http.ISolidHttpRequest,System.Action{System.Net.Http.HttpResponseMessage})">
+            <summary>
+            Performs an assertion against the http response message
+            </summary>
+            <param name="request">The Solid.Http request</param>
+            <param name="assert">The assertion action</param>
+            <returns>The fluent assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.SolidHttpRequestExtensions.Should(Solid.Http.ISolidHttpRequest,System.Func{System.Net.Http.HttpResponseMessage,System.Threading.Tasks.Task})">
+            <summary>
+            Performs an async assertion against the http response message
+            </summary>
+            <param name="request">The Solid.Http request</param>
+            <param name="assert">The async assertion action</param>
+            <returns>The fluent assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.SolidHttpRequestExtensions.ShouldRespondWith(Solid.Http.ISolidHttpRequest,System.Net.HttpStatusCode)">
+            <summary>
+            Asserts the status code of the response
+            </summary>
+            <param name="request">The Solid.Http request</param>
+            <param name="statusCode">The expected status code</param>
+            <returns>The fluent assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.SolidHttpRequestExtensions.ShouldRespondWith(Solid.Http.ISolidHttpRequest,System.Int32)">
+            <summary>
+            Asserts the status code of the response
+            </summary>
+            <param name="request">The Solid.Http request</param>
+            <param name="statusCode">The expected status code</param>
+            <returns>The fluent assertion</returns>
+        </member>
+        <member name="M:Solid.Testing.SolidHttpRequestExtensions.ShouldRespondSuccessfully(Solid.Http.ISolidHttpRequest)">
+            <summary>
+            Asserts that the status code of the response is successful (200-299)
+            </summary>
+            <param name="request">The Solid.Http request</param>
+            <returns>The fluent assertion</returns>
+        </member>
+        <member name="T:Solid.Testing.Models.Assertion">
+            <summary>
+            A fluent assertion object 
+            <para>This object is awaitable</para>
+            </summary>
+        </member>
+        <member name="M:Solid.Testing.Models.Assertion.#ctor(Solid.Http.ISolidHttpRequest)">
+            <summary>
+            Create an assertion
+            </summary>
+            <param name="request">The Solid.Http request to be performed</param>
+        </member>
+        <member name="P:Solid.Testing.Models.Assertion.Request">
+            <summary>
+            The Solid.Http request to be performed
+            </summary>
+        </member>
+        <member name="M:Solid.Testing.Models.Assertion.GetAwaiter">
+            <summary>
+            Gets the task awaiter 
+            <para>This enables await</para>
+            </summary>
+            <returns>A task awaiter</returns>
+        </member>
+        <member name="T:Solid.Testing.Models.HeaderAssertion">
+            <summary>
+            A fluent header assertion
+            </summary>
+        </member>
+        <member name="M:Solid.Testing.Models.HeaderAssertion.#ctor(System.String,Solid.Testing.Models.Assertion)">
+            <summary>
+            Create a header assertion
+            </summary>
+            <param name="name">The name of the header</param>
+            <param name="assertion">The base assertion</param>
+        </member>
+        <member name="P:Solid.Testing.Models.HeaderAssertion.Assertion">
+            <summary>
+            The base assertion
+            </summary>
+        </member>
+        <member name="T:Solid.Testing.Models.InMemoryHost">
+            <summary>
+            An in memory host wrapper
+            </summary>
+        </member>
+        <member name="M:Solid.Testing.Models.InMemoryHost.#ctor(System.IDisposable,System.Uri)">
+            <summary>
+            Create an in memory host wrapper
+            </summary>
+            <param name="host">The in memory host</param>
+            <param name="baseAddress">The base address of the in memory host</param>
+        </member>
+        <member name="P:Solid.Testing.Models.InMemoryHost.BaseAddress">
+            <summary>
+            The base address of the in memory host
+            </summary>
+        </member>
+        <member name="M:Solid.Testing.Models.InMemoryHost.Dispose">
+            <summary>
+            Disposes the in memory host
+            </summary>
+        </member>
+        <member name="T:Solid.Http.TestingServer">
+            <summary>
+            The testing server
+            </summary>
+        </member>
+        <member name="P:Solid.Http.TestingServer.BaseAddress">
+            <summary>
+            The base address of the testing server
+            </summary>
+        </member>
+        <member name="P:Solid.Http.TestingServer.Provider">
+            <summary>
+            The service provider for the server
+            <para>This is NOT the service provider that the in memory host uses internally</para>
+            </summary>
+        </member>
+        <member name="P:Solid.Http.TestingServer.Client">
+            <summary>
+            Solid.Http http client for communication to the in memory host
+            </summary>
+        </member>
+        <member name="M:Solid.Http.TestingServer.Dispose">
+            <summary>
+            Disposes the service scopes created for this testing server
+            </summary>
+        </member>
+        <member name="T:Solid.Http.TestingServerBuilder">
+            <summary>
+            The testing server builder
+            </summary>
+        </member>
+        <member name="M:Solid.Http.TestingServerBuilder.AddHostFactory``1">
+            <summary>
+            Adds a host factory of the generic type
+            </summary>
+            <typeparam name="TFactory">The implementation of IInMemoryHostFactory</typeparam>
+            <returns>The testing server builder</returns>
+        </member>
+        <member name="M:Solid.Http.TestingServerBuilder.AddHostFactory(Solid.Testing.Abstractions.Factories.IInMemoryHostFactory)">
+            <summary>
+            Adds a host factory of the generic type
+            </summary>
+            <param name="factory">An instance of IInMemoryHostFactory</param>
+            <returns>The testing server builder</returns>
+        </member>
+        <member name="M:Solid.Http.TestingServerBuilder.AddTestingServices(System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
+            <summary>
+            Adds services to the testing server service provider
+            <para>These are NOT services that are used internally by the in memory host</para>
+            </summary>
+            <param name="action">Add services action</param>
+            <returns>The testing server builder</returns>
+        </member>
+        <member name="M:Solid.Http.TestingServerBuilder.AddStartup``1">
+            <summary>
+            Adds the startup class
+            </summary>
+            <typeparam name="TStartup">The startup class type</typeparam>
+            <returns>The testing server builder</returns>
+        </member>
+        <member name="M:Solid.Http.TestingServerBuilder.AddStartup(System.Type)">
+            <summary>
+            Adds the startup type
+            </summary>
+            <param name="type">The startup class type</param>
+            <returns>The testing server builder</returns>
+        </member>
+        <member name="M:Solid.Http.TestingServerBuilder.ConfigureSolidHttp(System.Action{Solid.Http.SolidHttpBuilder})">
+            <summary>
+            Configures the Solid.Http http client used to communicate with the in memory host
+            </summary>
+            <param name="action">The configuration action</param>
+            <returns>The testing server builder</returns>
+        </member>
+        <member name="M:Solid.Http.TestingServerBuilder.Build">
+            <summary>
+            Builds the TestingServer
+            </summary>
+            <returns>The TestingServer</returns>
+        </member>
+    </members>
+</doc>
