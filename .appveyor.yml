@@ -11,6 +11,7 @@ image: Visual Studio 2019
 build_script:
   - ps: dotnet restore .
   - ps: dotnet build . --no-restore --configuration Release
+  - ps: dotnet test . --no-restore --no-build --configuration Release
 after_build:
   - ps: dotnet pack . --version-suffix "beta" --no-restore --no-build --configuration Release -o ./pack
 artifacts:
