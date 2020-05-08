@@ -15,7 +15,6 @@ namespace Solid.Http
     public class TestingServerBuilder
     {
         private Action<IServiceCollection> _servicesAction = (_ => { });
-        private Action<SolidHttpBuilder> _builderAction = (_ => { });
         private Type _startup;
         
         /// <summary>
@@ -93,11 +92,9 @@ namespace Solid.Http
         /// </summary>
         /// <param name="action">The configuration action</param>
         /// <returns>The testing server builder</returns>
+        [Obsolete("Use AddTestingServices(services => services.ConfigureSolidHttp(action)) instead")]
         public TestingServerBuilder ConfigureSolidHttp(Action<SolidHttpBuilder> action)
-        {
-            _builderAction += action;
-            return this;
-        }
+            => AddTestingServices(services => services.ConfigureSolidHttp(action));
 
         /// <summary>
         /// Builds the TestingServer
@@ -108,7 +105,7 @@ namespace Solid.Http
             var services = new ServiceCollection();
             foreach(var action in _servicesAction.GetInvocationList().Cast<Action<IServiceCollection>>())
                 action(services);   
-            services.AddSolidHttp(b => _builderAction(b));
+            services.AddSolidHttp();
 
             var provider = services.BuildServiceProvider();
             var factory = provider.GetService<IInMemoryHostFactory>();
