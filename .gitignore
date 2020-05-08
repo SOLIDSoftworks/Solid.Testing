@@ -50,7 +50,7 @@ bin
 obj
 .vs
 
-*.xml
+**/*.xml
 
 *.nupkg
 
