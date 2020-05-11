@@ -1,4 +1,4 @@
-# Solid.Testing [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://en.wikipedia.org/wiki/MIT_License) [![solidsoftworks AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/vy4d0qc5tp93nxhr?svg=true)](https://www.appveyor.com/)
+# Solid.Testing [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://en.wikipedia.org/wiki/MIT_License) [![Build status](https://ci.appveyor.com/api/projects/status/vy4d0qc5tp93nxhr/branch/master?svg=true)](https://www.appveyor.com/) ![Solid.Testing on nuget](https://img.shields.io/nuget/vpre/Solid.Testing.Core)
 
 Solid.Testing is a library used for integration testing and system testing of web apis. It's been designed to be used with AspNetCore and ASP.Net OWIN. It uses Solid.Http internally to perform HTTP requests to an in memory host.
 
@@ -8,7 +8,7 @@ Solid.Testing is a library used for integration testing and system testing of we
 * [Solid.Testing.Owin](https://www.nuget.org/packages/Solid.Testing.Owin) (net461)
 * [Solid.Testing.Core](https://www.nuget.org/packages/Solid.Testing.Core) (netstandard2.0)
 
-## TestingServer
+## Usage
 TestingServer is a class that wraps an in-memory instance of your api, whether it's AspNetCore 3.1 or ASP.Net OWIN. A random port is chosen for the in-memory hsot and a client set up internally for communication. Once you have an instance of the TestingServer, you can perform requests and assert them using a fluid interface.
 
 ``` csharp
@@ -16,7 +16,8 @@ TestingServer is a class that wraps an in-memory instance of your api, whether i
 [Fact]
 public async Task ShouldRespondWithTwoValues()
 {
-    await server
+    // This '_server' member is an instance of TestingServer
+    await _server
         // This is the fluent interface from Solid.Http 
         .GetAsync("values")
         .WithHeader("my-header", "my-header-value")
