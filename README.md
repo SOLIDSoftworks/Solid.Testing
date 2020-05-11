@@ -9,7 +9,7 @@ Solid.Testing is a library used for integration testing and system testing of we
 * [Solid.Testing.Core](https://www.nuget.org/packages/Solid.Testing.Core) (netstandard2.0)
 
 ## Usage
-TestingServer is a class that wraps an in-memory instance of your api, whether it's AspNetCore 3.1 or ASP.Net OWIN. A random port is chosen for the in-memory hsot and a client set up internally for communication. Once you have an instance of the TestingServer, you can perform requests and assert them using a fluid interface.
+TestingServer is a class that wraps an in-memory instance of your api, whether it's AspNetCore 3.1 or ASP.Net OWIN. A random port is chosen for the in-memory host and a client set up internally for communication. Once you have an instance of the TestingServer, you can perform requests and assert them using a fluid interface.
 
 ``` csharp
 
@@ -40,6 +40,10 @@ public async Task ShouldRespondWithTwoValues()
     ;
 }
 ```
+
+### Assertion methods
+
+Methods that extend _Solid.Testing.Models.Assertion_ or _Solid.Http.ISolidHttpRequest_ start with the __Should__ prefix. For convenience, they are all in the _Solid.Http_ namespace.
 
 ### Building the TestingServer
 To build a TestingServer, you need to use the TestingServerBuilder. There are different extension methods for AspNetCore and ASP.Net OWIN. It's also possible to extend this to another self-hosted http framework.
