@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Http;
+using Microsoft.Extensions.Options;
 using Solid.Testing.AspNetCore.Abstractions.Factories;
 using Solid.Testing.AspNetCore.Extensions.Https.Abstractions;
 using Solid.Testing.AspNetCore.Extensions.Https.Factories;
+using Solid.Testing.AspNetCore.Extensions.Https.Options;
 using Solid.Testing.AspNetCore.Extensions.Https.Providers;
 using System;
 using System.Collections.Generic;
@@ -59,12 +62,11 @@ namespace Solid.Http
                 { 
                     services
                         .AddSingleton<ISelfSignedCertificateFactory, SelfSignedCertificateFactory>()
-                        .AddSingleton<IHttpClientFactory, TestingHttpClientFactory>()
                         .AddSingleton<IWebHostFactory, HttpsWebHostFactory>()
+                        .AddSingleton<IConfigureOptions<HttpClientFactoryOptions>, ConfigureNamedHttpClientFactoryOptions>()
                     ;
                     services.TryAddTransient<IHttpClientProvider, TestingHttpClientProvider>();
                 })
-                //.ConfigureSolidHttp(b => b.UseHttpClientProvider<TestingHttpClientProvider>())
             ;
             return builder.AddAspNetCoreHostFactory(hostname, configure);
         }
