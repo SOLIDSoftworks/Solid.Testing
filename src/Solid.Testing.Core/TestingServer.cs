@@ -68,7 +68,7 @@ namespace Solid.Http
             return scope;
         }
 
-        Uri ISolidHttpClient.BaseAddress { get => this.BaseAddress; set => throw new NotImplementedException(); }
+        Uri ISolidHttpClient.BaseAddress { get => this.BaseAddress; }
 
         ISolidHttpClient ISolidHttpClient.OnRequestCreated(Action<IServiceProvider, ISolidHttpRequest> handler)
             => GetInnerClient().OnRequestCreated(handler);
