@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Solid.Testing.AspNetCore.Abstractions.Factories;
 using Solid.Testing.AspNetCore.Abstractions.Providers;
 using Solid.Testing.AspNetCore.Extensions.Https.Abstractions;
@@ -27,7 +28,12 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Factories
             return new WebHostBuilder()
                 .UseKestrel(options =>
                 {
-                    options.Listen(IPAddress.Loopback, 0, listener => listener.UseHttps(certificate));
+                    options.Listen(IPAddress.Loopback, 0, listener => listener.UseHttps(options =>
+                    {
+                        options.ServerCertificate = certificate;
+                        options.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
+                        options.AllowAnyClientCertificate();
+                    }));
                 })
                 .UseStartup(startup);
         }
