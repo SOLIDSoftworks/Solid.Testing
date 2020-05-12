@@ -73,7 +73,7 @@ namespace Solid.Http
         ISolidHttpClient ISolidHttpClient.OnRequestCreated(Action<IServiceProvider, ISolidHttpRequest> handler)
             => GetInnerClient().OnRequestCreated(handler);
 
-        ISolidHttpRequest ISolidHttpClient.PerformRequestAsync(HttpMethod method, Uri url, CancellationToken cancellationToken = default)
+        ISolidHttpRequest ISolidHttpClient.PerformRequestAsync(HttpMethod method, Uri url, CancellationToken cancellationToken)
             => GetInnerClient().PerformRequestAsync(method, url, cancellationToken);
     }
 }
