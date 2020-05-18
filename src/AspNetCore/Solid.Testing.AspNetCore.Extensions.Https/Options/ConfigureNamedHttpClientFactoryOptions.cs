@@ -15,10 +15,12 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Options
 
             options.HttpMessageHandlerBuilderActions.Add(builder =>
             {
-                if (builder.PrimaryHandler is HttpClientHandler legacy)
-                    ConfigureHttpClientHandler(name, legacy);
-                if (builder.PrimaryHandler is SocketsHttpHandler http)
-                    ConfigureSocketsHttpHandler(name, http);
+                if (builder.PrimaryHandler is HttpClientHandler httpClientHandler)
+                    ConfigureHttpClientHandler(name, httpClientHandler);
+#if NETCOREAPP3_1
+                if (builder.PrimaryHandler is SocketsHttpHandler socketsHttpHandler)
+                    ConfigureSocketsHttpHandler(name, socketsHttpHandler);
+#endif
             });
         }
 
@@ -34,6 +36,7 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Options
             };
         }
 
+#if NETCOREAPP3_1
         private void ConfigureSocketsHttpHandler(string host, SocketsHttpHandler handler)
         {
             handler.SslOptions.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
@@ -42,5 +45,6 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Options
                 return certificate.Subject == $"CN={host}";
             };
         }
+#endif
     }
 }

@@ -20,7 +20,7 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit.Logging
         public IDisposable BeginScope<TState>(TState state)
         {
             if (_output == null) return NullScope.Instance;
-            return new XUnitScopeOutput<TState>(state, (l, s) => Log<TState>(l, new EventId(0), s, null, (st, _) => st.ToString()));
+            return new DelegateScopeOutput<TState>(state, (l, s) => Log<TState>(l, new EventId(0), s, null, (st, _) => st.ToString()));
         }
 
         public bool IsEnabled(LogLevel logLevel) => true;

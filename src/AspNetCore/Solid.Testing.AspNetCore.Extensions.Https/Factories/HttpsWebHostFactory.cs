@@ -28,11 +28,13 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Factories
             return new WebHostBuilder()
                 .UseKestrel(options =>
                 {
-                    options.Listen(IPAddress.Loopback, 0, listener => listener.UseHttps(options =>
+                    options.Listen(IPAddress.Loopback, 0, listener => listener.UseHttps(https =>
                     {
-                        options.ServerCertificate = certificate;
-                        options.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
-                        options.AllowAnyClientCertificate();
+                        https.ServerCertificate = certificate;
+                        https.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
+#if NETCOREAPP3_1
+                        https.AllowAnyClientCertificate();
+#endif
                     }));
                 })
                 .UseStartup(startup);

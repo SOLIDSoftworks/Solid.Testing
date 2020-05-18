@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -15,23 +16,21 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
 {
     public class TestingServerFixture<TStartup> : IDisposable
     {
-        private static ConcurrentDictionary<Type, ITestOutputHelper> _helpers = new ConcurrentDictionary<Type, ITestOutputHelper>();
+        private static ConcurrentDictionary<Guid, ITestOutputHelper> _helpers = new ConcurrentDictionary<Guid, ITestOutputHelper>();
         private Lazy<TestingServer> _lazyTestingServer;
+        private AsyncLocal<Guid> _localGuid = new AsyncLocal<Guid> { Value = Guid.Empty };
 
         public TestingServerFixture()
-            : this(LogLevel.Debug)
-        {
-        }
-
-        protected TestingServerFixture(LogLevel defaultLogLevel)
         {
             _lazyTestingServer = new Lazy<TestingServer>(InitializeTestingServer, LazyThreadSafetyMode.ExecutionAndPublication);
-            DefaultLogLevel = defaultLogLevel;
         }
 
         public TestingServer TestingServer => _lazyTestingServer.Value;
-        public LogLevel DefaultLogLevel { get; }
-        public void SetOutput(ITestOutputHelper output) => _helpers.AddOrUpdate(GetType(), output, (key, _) => output);
+        public void SetOutput(ITestOutputHelper output)
+        {
+            _localGuid.Value = Guid.NewGuid();
+            _helpers.AddOrUpdate(_localGuid.Value, output, (key, _) => output);
+        }
 
         public void Dispose()
         {
@@ -46,27 +45,52 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
 
         private TestingServer InitializeTestingServer()
         {
-            var type = GetType();
-            return AddAspNetCoreHostFactory(new TestingServerBuilder(), builder =>
-            {
-                builder
-                    .ConfigureServices(s =>
-                    {
-                        s.AddLogging();
-                        s.AddTransient(_ => _helpers.TryGetValue(type, out var helper) ? helper : null);
-                        s.AddSingleton<ILoggerProvider>(p => new XUnitLoggerProvider(p));
-                    })
-                    .ConfigureServices(ConfigureServices)
-                    .ConfigureAppConfiguration((context, b) =>
-                    {
-                        var logging = new Dictionary<string, string>();
-                        logging.Add("Logging__IncludeScopes", "true");
-                        logging.Add("Logging__LogLevel__Default", DefaultLogLevel.ToString());
-                        b.AddInMemoryCollection(logging);
-                        ConfigureAppConfiguration(context, b);
-                    })
-                ;
-            })
+            const string key = "x-id";
+            return 
+                AddAspNetCoreHostFactory(new TestingServerBuilder(), builder =>
+                {                    
+                    builder
+                        .ConfigureServices((context, s) =>
+                        {
+                            s.AddLogging(logging => logging.AddConfiguration(context.Configuration.GetSection("Logging")));
+                            s.AddHttpContextAccessor();
+                            s.AddTransient<ITestOutputHelper>(p =>
+                            {
+                                var request = p.GetService<IHttpContextAccessor>()?.HttpContext?.Request;
+                                if (request == null) return null;
+
+                                var header = request.Headers[key].ToString();
+                                if (Guid.TryParse(header, out var guid) && _helpers.TryGetValue(guid, out var helper))
+                                    return helper;
+                                return null;
+                            });
+                            s.AddSingleton<ILoggerProvider, XUnitLoggerProvider>();
+                        })
+                        .ConfigureServices(ConfigureServices)
+                        .ConfigureAppConfiguration(ConfigureAppConfiguration)
+                    ;
+                })
+                .AddTestingServices(services =>
+                {
+                    services
+                        .ConfigureSolidHttp(builder =>
+                        {
+                            builder.Configure(options =>
+                            {
+                                options.OnRequestCreated(request =>
+                                {
+                                    request.WithHeader(key, _localGuid.Value.ToString());
+                                    request.BaseRequest.Properties.Add(key, _localGuid.Value);
+                                });
+                                options.OnHttpResponse(response =>
+                                {
+                                    if (!response.RequestMessage.Properties.TryGetValue(key, out var id)) return;
+                                    _helpers.TryRemove((Guid)id, out _);
+                                });
+                            });
+                        })
+                    ;
+                })
                 .AddStartup<TStartup>()
                 .Build()
             ;

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <VersionPrefix></VersionPrefix>
     <AssemblyVersion></AssemblyVersion>
@@ -9,9 +9,13 @@
     <InformationalVersion></InformationalVersion>
   </PropertyGroup>
   
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|AnyCPU'">
+  <PropertyGroup>
     <DocumentationFile>Solid.Testing.AspNetCore.Extensions.Https.xml</DocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup Condition="$(TargetFramework) == 'net472'">
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+  </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\Solid.Testing.AspNetCore\Solid.Testing.AspNetCore.csproj" />

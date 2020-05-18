@@ -4,12 +4,12 @@ using System.Text;
 
 namespace Solid.Testing.AspNetCore.Extensions.XUnit.Logging
 {
-    internal class XUnitScopeOutput<TState> : IDisposable
+    internal class DelegateScopeOutput<TState> : IDisposable
     {
         private TState _state;
         private Action<string, TState> _output;
 
-        public XUnitScopeOutput(TState state, Action<string, TState> output)
+        public DelegateScopeOutput(TState state, Action<string, TState> output)
         {
             output("Start", state);
             _state = state;
