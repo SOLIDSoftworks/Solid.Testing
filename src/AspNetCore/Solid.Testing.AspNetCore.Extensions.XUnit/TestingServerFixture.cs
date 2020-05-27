@@ -32,8 +32,11 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
             _helpers.AddOrUpdate(_localGuid.Value, output, (key, _) => output);
         }
 
+        protected virtual void Disposing() { }
+
         public void Dispose()
         {
+            Disposing();
             if (_lazyTestingServer.IsValueCreated)
                 TestingServer?.Dispose();
         }
@@ -42,6 +45,11 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
         protected virtual void ConfigureServices(IServiceCollection services) { }
         protected virtual TestingServerBuilder AddAspNetCoreHostFactory(TestingServerBuilder builder, Action<IWebHostBuilder> configure)
             => builder.AddAspNetCoreHostFactory(configure);
+
+        public Guid CurrentTestId => _localGuid.Value;
+        public void RemoveOutput(Guid testId)
+            => _helpers.TryRemove((Guid) testId, out _);
+
 
         private TestingServer InitializeTestingServer()
         {
@@ -79,13 +87,13 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
                             {
                                 options.OnRequestCreated(request =>
                                 {
-                                    request.WithHeader(key, _localGuid.Value.ToString());
+                                    request.WithHeader(key, CurrentTestId.ToString());
                                     request.BaseRequest.Properties.Add(key, _localGuid.Value);
                                 });
                                 options.OnHttpResponse(response =>
                                 {
                                     if (!response.RequestMessage.Properties.TryGetValue(key, out var id)) return;
-                                    _helpers.TryRemove((Guid)id, out _);
+                                    RemoveOutput((Guid)id);
                                 });
                             });
                         })
