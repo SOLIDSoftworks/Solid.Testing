@@ -8,19 +8,26 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
-using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System.Net;
+using Solid.Testing.AspNetCore.Logging;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace Solid.Testing.AspNetCore.Factories
 {
-    internal class DefaultWebHostFactory : WebHostFactory
+    public class DefaultWebHostFactory : WebHostFactory
     {
         public DefaultWebHostFactory(IWebHostOptionsProvider provider)
             : base(provider)
         {
         }
         protected override IWebHostBuilder InitializeWebHostBuilder(Type startup, string hostname) =>
-            new WebHostBuilder().UseKestrel(o => o.Listen(IPAddress.Loopback, 0)).UseStartup(startup);
+            new WebHostBuilder()
+                .UseKestrel(o => ConfigureKestrel(o, hostname))
+                .UseStartup(startup)
+            ;
+
+        protected virtual void ConfigureKestrel(KestrelServerOptions options, string hostname) => options.Listen(IPAddress.Loopback, 0);
     }
 }

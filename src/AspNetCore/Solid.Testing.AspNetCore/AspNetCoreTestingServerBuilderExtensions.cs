@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Solid.Testing;
 using Solid.Testing.AspNetCore.Abstractions;
 using Solid.Testing.AspNetCore.Abstractions.Factories;
 using Solid.Testing.AspNetCore.Abstractions.Providers;
 using Solid.Testing.AspNetCore.Factories;
+using Solid.Testing.AspNetCore.Logging;
 using Solid.Testing.AspNetCore.Options;
 using Solid.Testing.AspNetCore.Providers;
 using Solid.Testing.Extensions.AspNetCore.Factories;
@@ -54,19 +57,64 @@ namespace Solid.Http
         /// <param name="configure">Configuration delegate for the web host</param>
         /// <returns>The testing server builder</returns>
         public static TestingServerBuilder AddAspNetCoreHostFactory(this TestingServerBuilder builder, string hostname, Action<IWebHostBuilder> configure)
+            => builder.AddAspNetCoreHostFactory(options => options.HostName = hostname, configure);
+
+        /// <summary>
+        /// Adds the host factory for asp net core
+        /// </summary>
+        /// <param name="builder">The testing server builder</param>
+        /// <param name="configureOptions">Configures options.</param>
+        /// <param name="configure">Configuration delegate for the web host</param>
+        /// <returns>The testing server builder</returns>
+        public static TestingServerBuilder AddAspNetCoreHostFactory(this TestingServerBuilder builder, Action<AspNetCoreHostOptions> configureOptions, Action<IWebHostBuilder> configure)
         {
-            var options = new UrlOptions
+            var channel = new LogMessageChannel();
+
+            var c = new Action<IWebHostBuilder>(b =>
             {
-                HostName = hostname
-            };
-            builder.AddTestingServices(services =>
-            {
-                services.AddSingleton<IWebHostOptionsProvider>(new WebHostOptionsProvider { Configure = configure });
-                services.TryAddSingleton<IWebHostFactory, DefaultWebHostFactory>();
-                services.AddSingleton(options);
+                b.ConfigureServices((context, services) =>
+                    {
+                        services.RemoveAll<LogMessageChannel>();
+                        services.AddSingleton(channel);
+                        services.AddSingleton<ILoggerProvider, ChannelLoggerProvider>();
+                        services.AddLogging(logging => logging.AddConfiguration(context.Configuration.GetSection("Logging")));
+                    })
+                    .ConfigureAppConfiguration(config =>
+                    {
+                        var dictionary = new Dictionary<string, string>();
+
+                        dictionary.Add("Logging:IncludeScopes", "true");
+                        dictionary.Add("Logging:LogLevel:Default", "Information");
+
+                        config.AddInMemoryCollection(dictionary);
+                    })
+                ;
+
+                configure(b);
             });
 
+            builder
+                .ConfigureAspNetCoreHost(configureOptions)
+                .AddTestingServices(services =>
+                {
+                    services.RemoveAll<LogMessageChannel>();
+                    services.RemoveAll<LogMessageReader>();
+                    services.AddSingleton(channel);
+                    services.AddSingleton<LogMessageReader>();
+                    services.AddSingleton<IWebHostOptionsProvider>(new WebHostOptionsProvider { Configure = c });
+                    services.TryAddSingleton<IWebHostFactory, DefaultWebHostFactory>();
+                })
+            ;
+
             return builder.AddHostFactory<AspNetCoreInMemoryHostFactory>();
+        }
+
+        public static TestingServerBuilder ConfigureAspNetCoreHost(this TestingServerBuilder builder, Action<AspNetCoreHostOptions> configureOptions)
+        {
+            return builder.AddTestingServices(services =>
+            {
+                services.Configure(configureOptions);
+            }); 
         }
     }
 }

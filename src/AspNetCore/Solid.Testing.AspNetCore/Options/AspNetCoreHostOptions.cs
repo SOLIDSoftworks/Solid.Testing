@@ -4,8 +4,9 @@ using System.Text;
 
 namespace Solid.Testing.AspNetCore.Options
 {
-    internal class UrlOptions
+    public class AspNetCoreHostOptions
     {
         public string HostName { get; set; }
+        public Action<IServiceProvider, string> OnLogMessage { get; set; } = (_, __) => { };
     }
 }

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Solid.Http;
-using Solid.Testing.AspNetCore.Extensions.XUnit.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,20 +15,23 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
 {
     public class TestingServerFixture<TStartup> : IDisposable
     {
-        private static ConcurrentDictionary<Guid, ITestOutputHelper> _helpers = new ConcurrentDictionary<Guid, ITestOutputHelper>();
-        private Lazy<TestingServer> _lazyTestingServer;
-        private AsyncLocal<Guid> _localGuid = new AsyncLocal<Guid> { Value = Guid.Empty };
+        private static readonly string DefaultKey = string.Empty;
+        private ConcurrentDictionary<string, TestingServer> _testingServers;
 
         public TestingServerFixture()
         {
-            _lazyTestingServer = new Lazy<TestingServer>(InitializeTestingServer, LazyThreadSafetyMode.ExecutionAndPublication);
+            _testingServers = new ConcurrentDictionary<string, TestingServer>(); 
         }
+        public TestingServer TestingServer => GetTestingServer(DefaultKey);
 
-        public TestingServer TestingServer => _lazyTestingServer.Value;
+        public TestingServer GetTestingServer(string key)
+            => _testingServers.GetOrAdd(key, k => InitializeTestingServer(k));
+
         public void SetOutput(ITestOutputHelper output)
         {
-            _localGuid.Value = Guid.NewGuid();
-            _helpers.AddOrUpdate(_localGuid.Value, output, (key, _) => output);
+            if (CurrentOutput != null)
+                throw new InvalidOperationException("Running multiple tests concurrently using single test fixture not supported.");
+            CurrentOutput = output;
         }
 
         protected virtual void Disposing() { }
@@ -37,46 +39,35 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
         public void Dispose()
         {
             Disposing();
-            if (_lazyTestingServer.IsValueCreated)
-                TestingServer?.Dispose();
+            foreach (var server in _testingServers.Values)
+                server.Dispose();
         }
-
+        protected virtual void ConfigureAppConfiguration(string name, WebHostBuilderContext context, IConfigurationBuilder builder) => ConfigureAppConfiguration(context, builder);
         protected virtual void ConfigureAppConfiguration(WebHostBuilderContext context, IConfigurationBuilder builder) { }
+        protected virtual void ConfigureServices(string name, IServiceCollection services) => ConfigureServices(services);
         protected virtual void ConfigureServices(IServiceCollection services) { }
+        protected virtual TestingServerBuilder AddAspNetCoreHostFactory(string name, TestingServerBuilder builder, Action<IWebHostBuilder> configure)
+            => AddAspNetCoreHostFactory(builder, configure);
         protected virtual TestingServerBuilder AddAspNetCoreHostFactory(TestingServerBuilder builder, Action<IWebHostBuilder> configure)
             => builder.AddAspNetCoreHostFactory(configure);
+        private ITestOutputHelper CurrentOutput { get; set; }
 
-        public Guid CurrentTestId => _localGuid.Value;
-        public void RemoveOutput(Guid testId)
-            => _helpers.TryRemove((Guid) testId, out _);
-
-
-        private TestingServer InitializeTestingServer()
+        private TestingServer InitializeTestingServer(string name)
         {
-            const string key = "x-id";
             return 
-                AddAspNetCoreHostFactory(new TestingServerBuilder(), builder =>
-                {                    
+                AddAspNetCoreHostFactory(name, new TestingServerBuilder(), builder =>
+                {
                     builder
-                        .ConfigureServices((context, s) =>
-                        {
-                            s.AddLogging(logging => logging.AddConfiguration(context.Configuration.GetSection("Logging")));
-                            s.AddHttpContextAccessor();
-                            s.AddTransient<ITestOutputHelper>(p =>
-                            {
-                                var request = p.GetService<IHttpContextAccessor>()?.HttpContext?.Request;
-                                if (request == null) return null;
-
-                                var header = request.Headers[key].ToString();
-                                if (Guid.TryParse(header, out var guid) && _helpers.TryGetValue(guid, out var helper))
-                                    return helper;
-                                return null;
-                            });
-                            s.AddSingleton<ILoggerProvider, XUnitLoggerProvider>();
-                        })
-                        .ConfigureServices(ConfigureServices)
-                        .ConfigureAppConfiguration(ConfigureAppConfiguration)
+                        .ConfigureServices(services => ConfigureServices(name, services))
+                        .ConfigureAppConfiguration((ctx, b) => ConfigureAppConfiguration(name, ctx, b))
                     ;
+                })
+                .ConfigureAspNetCoreHost(options =>
+                {
+                    options.OnLogMessage = (services, message) =>
+                    {
+                        CurrentOutput?.WriteLine(message);
+                    };
                 })
                 .AddTestingServices(services =>
                 {
@@ -85,15 +76,9 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
                         {
                             builder.Configure(options =>
                             {
-                                options.OnRequestCreated(request =>
-                                {
-                                    request.WithHeader(key, CurrentTestId.ToString());
-                                    request.BaseRequest.Properties.Add(key, _localGuid.Value);
-                                });
                                 options.OnHttpResponse(response =>
                                 {
-                                    if (!response.RequestMessage.Properties.TryGetValue(key, out var id)) return;
-                                    RemoveOutput((Guid)id);
+                                    CurrentOutput = null;
                                 });
                             });
                         })

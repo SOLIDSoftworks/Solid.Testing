@@ -13,18 +13,24 @@ using Solid.Testing.AspNetCore.Options;
 using System.Threading.Tasks;
 using Solid.Testing.AspNetCore.Abstractions.Factories;
 using Solid.Testing.Abstractions.Factories;
+using Microsoft.Extensions.Options;
+using Solid.Testing.AspNetCore.Logging;
 
 namespace Solid.Testing.Extensions.AspNetCore.Factories
 {
-    internal class AspNetCoreInMemoryHostFactory : IInMemoryHostFactory
+    internal class AspNetCoreInMemoryHostFactory : IInMemoryHostFactory, IDisposable
     {
         private IWebHostFactory _factory;
-        private string _hostname;
+        private LogMessageReader _reader;
+        private AspNetCoreHostOptions _options;
+        private IDisposable _optionsChangeToken;
 
-        public AspNetCoreInMemoryHostFactory(IWebHostFactory factory, UrlOptions options)
+        public AspNetCoreInMemoryHostFactory(IWebHostFactory factory, LogMessageReader reader, IOptionsMonitor<AspNetCoreHostOptions> monitor)
         {
             _factory = factory;
-            _hostname = options.HostName;
+            _reader = reader;
+            _options = monitor.CurrentValue;
+            _optionsChangeToken = monitor.OnChange((options, _) => _options = options);
         }
 
         public IInMemoryHost CreateHost<TStartup>()
@@ -36,19 +42,24 @@ namespace Solid.Testing.Extensions.AspNetCore.Factories
         {
             EnsureLocal();
 
-            var host = _factory.CreateWebHost(startup, _hostname);
+            var host = _factory.CreateWebHost(startup, _options.HostName);
 
             var urls = host.ServerFeatures.Get<IServerAddressesFeature>();
             var baseAddresses = urls.Addresses.Select(s => new Uri(s));
             var baseAddress = baseAddresses.First();
             //var baseAddress = urls.Addresses.Select(s => new Uri(s)).First();
-            var url = new Uri($"{baseAddress.Scheme}://{_hostname}:{baseAddress.Port}");
+            var url = new Uri($"{baseAddress.Scheme}://{_options.HostName}:{baseAddress.Port}");
+
+            _reader.Start();
+
             return new InMemoryHost(host, url);
         }
 
+        public void Dispose() => _optionsChangeToken?.Dispose();
+
         private void EnsureLocal()
         {
-            var addresses = Dns.GetHostAddresses(_hostname);
+            var addresses = Dns.GetHostAddresses(_options.HostName);
             if (!addresses.Any(a => a.Equals(IPAddress.Loopback)))
                 throw new ArgumentException("Parameter must be a local host name", "hostname");
         }

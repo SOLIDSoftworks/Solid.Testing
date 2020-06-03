@@ -3,28 +3,31 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Solid.Http;
+using Solid.Testing.AspNetCore.Extensions.XUnit;
 using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Sdk;
 
 namespace Solid.Testing.AspNetCore.Tests
 {
-    public class HostTests : IClassFixture<HostTestFixture>
+    public class HostTests : IClassFixture<TestingServerFixture<Startup>>
     {
-        private TestingServer _server;
+        private TestingServerFixture<Startup> _fixture;
 
-        public HostTests(HostTestFixture fixture)
+        public HostTests(TestingServerFixture<Startup> fixture, ITestOutputHelper output)
         {
-            _server = fixture.TestingServer;
+            fixture.SetOutput(output);
+            _fixture = fixture;
         }
 
         [Fact]
         public async Task ShouldReadJsonConfigFromApplicationFolder()
         {
-            var response = await _server.GetAsync("ShouldReadJsonConfigFromApplicationFolder");
+            var response = await _fixture.TestingServer.GetAsync("ShouldReadJsonConfigFromApplicationFolder");
             var text = await response.Content.ReadAsStringAsync();
             Assert.Equal("external", text);
         }
@@ -32,7 +35,7 @@ namespace Solid.Testing.AspNetCore.Tests
         [Fact]
         public async Task ShouldReadJsonConfigFromTestFolder()
         {
-            var response = await _server.GetAsync("ShouldReadJsonConfigFromTestFolder");
+            var response = await _fixture.TestingServer.GetAsync("ShouldReadJsonConfigFromTestFolder");
             var text = await response.Content.ReadAsStringAsync();
             Assert.Equal("overridden", text);
         }
@@ -45,7 +48,7 @@ namespace Solid.Testing.AspNetCore.Tests
             var asserted2 = false;
             var assertion2 = new Action<HttpResponseMessage>(_ => asserted2 = true);
 
-            var response = await _server
+            var response = await _fixture.TestingServer
                 .GetAsync("ShouldReadJsonConfigFromTestFolder")
                 .Should(assertion1)
                 .Should(assertion2)
@@ -63,7 +66,7 @@ namespace Solid.Testing.AspNetCore.Tests
             var exception = null as Exception;
             try
             {
-                await _server
+                await _fixture.TestingServer
                     .GetAsync("ShouldReadJsonConfigFromTestFolder")
                     .Should(_ => Assert.True(false))
                     .Should(assertion)

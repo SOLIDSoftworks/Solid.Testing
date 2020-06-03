@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspNetCoreApplication\AspNetCoreApplication.csproj" />
+    <ProjectReference Include="..\Solid.Testing.AspNetCore.Extensions.XUnit\Solid.Testing.AspNetCore.Extensions.XUnit.csproj" />
     <ProjectReference Include="..\Solid.Testing.AspNetCore\Solid.Testing.AspNetCore.csproj" />
   </ItemGroup>
 
