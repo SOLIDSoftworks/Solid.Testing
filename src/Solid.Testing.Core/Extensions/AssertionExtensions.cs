@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Solid.Testing.Exceptions;
 using System.Net;
 
-namespace Solid.Testing
+namespace Solid.Http
 {
     /// <summary>
     /// Assertion extensions

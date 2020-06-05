@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Solid.Testing
+namespace Solid.Http
 {
     /// <summary>
     /// Header value assertion extensions

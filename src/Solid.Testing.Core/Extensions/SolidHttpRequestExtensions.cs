@@ -10,7 +10,7 @@ using Solid.Testing.Exceptions;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Solid.Testing
+namespace Solid.Http
 {
     /// <summary>
     /// Extensions for ISolidHttpRequest

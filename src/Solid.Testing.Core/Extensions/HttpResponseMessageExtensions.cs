@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 
-namespace Solid.Testing
+namespace Solid.Http
 {
     internal static class HttpResponseMessageExtensions
     {
