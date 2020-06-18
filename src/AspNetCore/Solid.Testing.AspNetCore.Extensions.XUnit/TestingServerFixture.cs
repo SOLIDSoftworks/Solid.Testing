@@ -17,28 +17,18 @@ using Xunit.Abstractions;
 
 namespace Solid.Testing.AspNetCore.Extensions.XUnit
 {
-    public class TestingServerFixture<TStartup> : IDisposable
+    public class TestingServerFixture<TStartup> : TestingServerFixtureBase, IDisposable
     {
         private Lazy<TestingServer> _lazyTestingServer;
         private InMemoryConfigurationSource _configurationSource;
-        private ConcurrentDictionary<Guid, ITestOutputHelper> _helpers;
-        private AsyncLocal<Guid> _localGuid = new AsyncLocal<Guid>();
-        //private int _requests = 0;
-        //private bool _wait = false;
 
         public TestingServerFixture()
+            : base()
         {
             _lazyTestingServer = new Lazy<TestingServer>(InitializeTestingServer, LazyThreadSafetyMode.ExecutionAndPublication);
-            _helpers = new ConcurrentDictionary<Guid, ITestOutputHelper>();
         }
         public TestingServer TestingServer => _lazyTestingServer.Value;
-
-        public void SetOutput(ITestOutputHelper output)
-        {
-            _localGuid.Value = Guid.NewGuid();
-            _helpers.AddOrUpdate(_localGuid.Value, output, (_, __) => output);
-        }
-
+        
         public void Dispose()
         {
             Disposing();
@@ -84,66 +74,24 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
         protected TestingServer InitializeTestingServer()
         {
             return 
-                AddAspNetCoreHostFactory(new TestingServerBuilder(), builder =>
+                AddAspNetCoreHostFactory(new TestingServerBuilder(), host =>
                 {
-                    builder
+                    host
                         .ConfigureServices(services =>
                         {
-                            services.AddHttpContextAccessor();
-                            services.Configure<ChannelLoggerOptions>(options =>
-                            {
-                                options.OnCreatingLogMessage = (provider, context) =>
-                                {
-                                    var accessor = provider.GetRequiredService<IHttpContextAccessor>();
-                                    if (accessor.HttpContext?.Request.Headers.TryGetValue("x-output-id", out var id) == true)
-                                        context.Properties.Add("id", Guid.Parse(id));
-                                };
-                            });
+                            ConfigureRequiredServices(services);
                             ConfigureServices(services);
                         })
-                        .ConfigureAppConfiguration((ctx, b) =>
+                        .ConfigureAppConfiguration((ctx, config) =>
                         {
-                            var inMemoryConfigurationBuilder = new InMemoryConfigurationBuilder();
-                            ConfigureAppConfiguration(inMemoryConfigurationBuilder);
-                            var source = inMemoryConfigurationBuilder.Build();
+                            ConfigureAppConfiguration(config, ConfigureAppConfiguration, out var source);
+                            ConfigureAppConfiguration(ctx, config);
                             _configurationSource = source;
-                            b.Sources.Add(source);
-
-                            ConfigureAppConfiguration(ctx, b);
                         })
                     ;
                 })
-                .ConfigureAspNetCoreHost(options =>
-                {
-                    options.OnLogMessage = context =>
-                    {
-                        if (context.Properties.TryGetValue("id", out var id) && _helpers.TryGetValue((Guid)id, out var helper))
-                            helper.WriteLine(context.Message);
-                    };
-                })
-                .AddTestingServices(services =>
-                {
-                    services
-                        .ConfigureSolidHttp(builder =>
-                        {
-                            builder.Configure(options =>
-                            {
-                                options.OnRequestCreated(request =>
-                                {
-                                    var g = _localGuid.Value;
-                                    request.WithHeader("x-output-id", g.ToString());
-                                });
-                                options.OnHttpResponse(async (s, r) =>
-                                {
-                                    var channel = s.GetRequiredService<LogMessageChannel>();
-                                    if (channel.MessagesWaiting)
-                                        await Task.Delay(50);
-                                    _helpers.TryRemove(_localGuid.Value, out _);
-                                });
-                            });
-                        })
-                    ;
-                })
+                .ConfigureAspNetCoreHost(ConfigureAspNetCoreHost)
+                .AddTestingServices(ConfigureRequiredTestingServices)
                 .AddStartup<TStartup>()
                 .Build()
             ;
