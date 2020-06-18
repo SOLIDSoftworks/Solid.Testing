@@ -70,27 +70,19 @@ namespace Solid.Http
         {
             var channel = new LogMessageChannel();
 
-            var c = new Action<IWebHostBuilder>(b =>
+            var c = new Action<IWebHostBuilder>(webHost =>
             {
-                b.ConfigureServices((context, services) =>
+                webHost
+                    .ConfigureServices((context, services) =>
                     {
                         services.RemoveAll<LogMessageChannel>();
                         services.AddSingleton(channel);
                         services.AddSingleton<ILoggerProvider, ChannelLoggerProvider>();
                         services.AddLogging(logging => logging.AddConfiguration(context.Configuration.GetSection("Logging")));
                     })
-                    .ConfigureAppConfiguration(config =>
-                    {
-                        var dictionary = new Dictionary<string, string>();
-
-                        dictionary.Add("Logging:IncludeScopes", "true");
-                        dictionary.Add("Logging:LogLevel:Default", "Information");
-
-                        config.AddInMemoryCollection(dictionary);
-                    })
                 ;
 
-                configure(b);
+                configure(webHost);
             });
 
             builder

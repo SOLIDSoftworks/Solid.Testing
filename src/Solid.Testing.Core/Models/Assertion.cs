@@ -10,30 +10,30 @@ using System.Net.Http;
 namespace Solid.Testing.Models
 {
     /// <summary>
-    /// A fluent assertion object 
-    /// <para>This object is awaitable</para>
+    /// A fluent <see cref="Assertion"/> object.
+    /// <para>This object is awaitable.</para>
     /// </summary>
     public class Assertion
     {
         /// <summary>
-        /// Create an assertion
+        /// Create an <see cref="Assertion"/>.
         /// </summary>
-        /// <param name="request">The Solid.Http request to be performed</param>
+        /// <param name="request">The <see cref="ISolidHttpRequest"/> to be performed.</param>
         public Assertion(ISolidHttpRequest request)
         {
             Request = request;
         }
 
         /// <summary>
-        /// The Solid.Http request to be performed
+        /// The <see cref="ISolidHttpRequest"/> to be performed.
         /// </summary>
         public ISolidHttpRequest Request { get; }
 
         /// <summary>
-        /// Gets the task awaiter 
-        /// <para>This enables await</para>
+        /// Gets the <see cref="TaskAwaiter{TResult}" /> of <seealso cref="HttpResponseMessage"/>.
+        /// <para>This enables await.</para>
         /// </summary>
-        /// <returns>A task awaiter</returns>
+        /// <returns>A <see cref="TaskAwaiter{TResult}" /> of <seealso cref="HttpResponseMessage"/>.</returns>
         public TaskAwaiter<HttpResponseMessage> GetAwaiter()
         {
             Func<Assertion, Task<HttpResponseMessage>> waiter = (async r =>

@@ -12,7 +12,7 @@ using System.Threading;
 namespace Solid.Http
 {
     /// <summary>
-    /// The testing server
+    /// A wrapper around an in-memory hosted service and a client to perform request on the in-memory hosted service.
     /// </summary>
     public class TestingServer : ISolidHttpClient, IDisposable
     {
@@ -29,17 +29,20 @@ namespace Solid.Http
         }
 
         /// <summary>
-        /// The base address of the testing server
+        /// The base address of the testing server.
         /// </summary>
         public Uri BaseAddress => _host.BaseAddress;
 
         /// <summary>
-        /// The service provider for the server
-        /// <para>This is NOT the service provider that the in memory host uses internally</para>
+        /// The <see cref="IServiceProvider"/> for the testing server.
+        /// <para>This is NOT the <see cref="IServiceProvider"/> that the in-memory host uses internally.</para>
         /// </summary>
         public IServiceProvider Provider => CreateScope().ServiceProvider;
 
-        [Obsolete("The TestingServer is now it's own client")]
+        /// <summary>
+        /// The <see cref="ISolidHttpClient"/> that is paired with the <seealso cref="TestingServer"/>.
+        /// </summary>
+        [Obsolete("Will be removed in next major release. The TestingServer is now it's own client.")]
         public ISolidHttpClient Client => GetInnerClient();
 
         private ISolidHttpClient GetInnerClient()
@@ -53,7 +56,7 @@ namespace Solid.Http
         }
 
         /// <summary>
-        /// Disposes the service scopes created for this testing server
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
@@ -74,6 +77,7 @@ namespace Solid.Http
             => GetInnerClient().OnRequestCreated(handler);
 
         ISolidHttpRequest ISolidHttpClient.PerformRequestAsync(HttpMethod method, Uri url, CancellationToken cancellationToken)
-            => GetInnerClient().PerformRequestAsync(method, url, cancellationToken);
+            => GetInnerClient()
+                .PerformRequestAsync(method, url, cancellationToken);
     }
 }

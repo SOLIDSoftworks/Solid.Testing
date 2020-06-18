@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Solid.Testing.AspNetCore.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,11 +9,15 @@ namespace Solid.Testing.AspNetCore.Logging
 {
     internal class ChannelLogger : ILogger
     {
+        private ChannelLoggerOptions _options;
+        private IServiceProvider _services;
         private LogMessageChannel _channel;
         private string _category;
 
-        public ChannelLogger(LogMessageChannel channel, string category)
+        public ChannelLogger(ChannelLoggerOptions options, IServiceProvider services, LogMessageChannel channel, string category)
         {
+            _options = options;
+            _services = services;
             _channel = channel;
             _category = category;
         }
@@ -29,10 +34,13 @@ namespace Solid.Testing.AspNetCore.Logging
             var message = $"[{DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")}][{logLevel.PadRight(12)}] - {formatter(state, exception)} ({_category})";
             if (exception != null)
                 message = message + Environment.NewLine + exception.ToString();
-            _channel.Enqueue(message);
+            var context = new LogMessageContext(message);
+            _options.OnCreatingLogMessage(_services, context);
+            _channel.Enqueue(context);
         }
 
         private void LogScopeOutput<TState>(string logLevel, TState state)
             => Log(logLevel, 0, state, null, (s, _) => s.ToString());
+
     }
 }

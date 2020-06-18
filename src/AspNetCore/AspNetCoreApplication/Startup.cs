@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AspNetCoreApplication
 {
@@ -26,9 +28,17 @@ namespace AspNetCoreApplication
             app
                 .Use((context, next) =>
                 {
+                    var options = context.RequestServices.GetService<IOptionsSnapshot<LoggerFilterOptions>>().Value;
                     var factory = context.RequestServices.GetService<ILoggerFactory>();
-                    var logger = factory.CreateLogger("incoming");
-                    logger.LogInformation("Incoming request");
+                    var logger = factory.CreateLogger<Startup>();
+
+                    var rule = options.Rules.FirstOrDefault();
+                    logger.Log(LogLevel.Trace, rule?.LogLevel?.ToString() ?? "no rule");
+                    logger.Log(LogLevel.Debug, rule?.LogLevel?.ToString() ?? "no rule");
+                    logger.Log(LogLevel.Information, rule?.LogLevel?.ToString() ?? "no rule");
+                    logger.Log(LogLevel.Warning, rule?.LogLevel?.ToString() ?? "no rule");
+                    logger.Log(LogLevel.Error, rule?.LogLevel?.ToString() ?? "no rule");
+                    logger.Log(LogLevel.Critical, rule?.LogLevel?.ToString() ?? "no rule");
 
                     return next();
                 })

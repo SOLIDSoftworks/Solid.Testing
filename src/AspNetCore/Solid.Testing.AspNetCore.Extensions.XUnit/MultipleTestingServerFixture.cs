@@ -2,14 +2,11 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Solid.Http;
 using Solid.Testing.AspNetCore.Logging;
-using Solid.Testing.AspNetCore.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,21 +14,22 @@ using Xunit.Abstractions;
 
 namespace Solid.Testing.AspNetCore.Extensions.XUnit
 {
-    public class TestingServerFixture<TStartup> : IDisposable
+    public class MultipleTestingServerFixture<TStartup>
     {
-        private Lazy<TestingServer> _lazyTestingServer;
-        private InMemoryConfigurationSource _configurationSource;
+        private ConcurrentDictionary<string, TestingServer> _testingServers;
+        private ConcurrentDictionary<string, InMemoryConfigurationSource> _configurationSources;
         private ConcurrentDictionary<Guid, ITestOutputHelper> _helpers;
         private AsyncLocal<Guid> _localGuid = new AsyncLocal<Guid>();
-        //private int _requests = 0;
-        //private bool _wait = false;
 
-        public TestingServerFixture()
+        public MultipleTestingServerFixture()
         {
-            _lazyTestingServer = new Lazy<TestingServer>(InitializeTestingServer, LazyThreadSafetyMode.ExecutionAndPublication);
+            _testingServers = new ConcurrentDictionary<string, TestingServer>();
+            _configurationSources = new ConcurrentDictionary<string, InMemoryConfigurationSource>();
             _helpers = new ConcurrentDictionary<Guid, ITestOutputHelper>();
         }
-        public TestingServer TestingServer => _lazyTestingServer.Value;
+
+        public TestingServer GetTestingServer(string key)
+            => _testingServers.GetOrAdd(key, k => InitializeTestingServer(k));
 
         public void SetOutput(ITestOutputHelper output)
         {
@@ -42,49 +40,41 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
         public void Dispose()
         {
             Disposing();
-            if (_lazyTestingServer.IsValueCreated)
-                _lazyTestingServer.Value.Dispose();
+            foreach (var server in _testingServers.Values)
+                server.Dispose();
         }
 
-        /// <summary>
-        /// Updates the configuration for the TestingServer.
-        /// <para>Disclaimer: Not all services/extensions register callbacks on the configuration change token.</para>
-        /// </summary>
-        /// <param name="configure"></param>
-        /// <param name="clear"></param>
-        public virtual void UpdateConfiguration(Action<IInMemoryConfigurationBuilderRoot> configure, bool clear = false)
+        public virtual void UpdateConfiguration(string name, Action<IInMemoryConfigurationBuilderRoot> configure, bool clear = false)
         {
             var builder = new InMemoryConfigurationBuilder();
             configure(builder);
-            UpdateConfiguration(builder.InMemoryConfiguration, clear);
+            UpdateConfiguration(name, builder.InMemoryConfiguration, clear);
         }
 
-        public virtual void UpdateConfiguration(IDictionary<string, string> data, bool clear = false)
+        public virtual void UpdateConfiguration(string name, IDictionary<string, string> data, bool clear = false)
         {
             // ensure initialized
-            _ = TestingServer;
-            if (_configurationSource == null) return;
+            _ = GetTestingServer(name);
+            if (!_configurationSources.TryGetValue(name, out var source)) return;
 
-            //if(_requests > 0)
-            //    _wait = true;
             if (clear)
-                _configurationSource.Provider.Clear();
+                source.Provider.Clear();
 
-            _configurationSource.Provider.Update(data);
-            _configurationSource.Provider.Load();
+            source.Provider.Update(data);
+            source.Provider.Load();
         }
 
         protected virtual void Disposing() { }
-        protected virtual void ConfigureAppConfiguration(IInMemoryConfigurationBuilderRoot builder) { }
-        protected virtual void ConfigureAppConfiguration(WebHostBuilderContext context, IConfigurationBuilder builder) { }
-        protected virtual void ConfigureServices(IServiceCollection services) { }
-        protected virtual TestingServerBuilder AddAspNetCoreHostFactory(TestingServerBuilder builder, Action<IWebHostBuilder> configure)
+        protected virtual void ConfigureAppConfiguration(string name, WebHostBuilderContext context, IConfigurationBuilder builder) { }
+        protected virtual void ConfigureAppConfiguration(string name, IInMemoryConfigurationBuilderRoot builder) { }
+        protected virtual void ConfigureServices(string name, IServiceCollection services) { }
+        protected virtual TestingServerBuilder AddAspNetCoreHostFactory(string name, TestingServerBuilder builder, Action<IWebHostBuilder> configure)
             => builder.AddAspNetCoreHostFactory(configure);
 
-        protected TestingServer InitializeTestingServer()
+        protected TestingServer InitializeTestingServer(string name)
         {
-            return 
-                AddAspNetCoreHostFactory(new TestingServerBuilder(), builder =>
+            return
+                AddAspNetCoreHostFactory(name, new TestingServerBuilder(), builder =>
                 {
                     builder
                         .ConfigureServices(services =>
@@ -99,17 +89,17 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
                                         context.Properties.Add("id", Guid.Parse(id));
                                 };
                             });
-                            ConfigureServices(services);
+                            ConfigureServices(name, services);
                         })
                         .ConfigureAppConfiguration((ctx, b) =>
                         {
                             var inMemoryConfigurationBuilder = new InMemoryConfigurationBuilder();
-                            ConfigureAppConfiguration(inMemoryConfigurationBuilder);
+                            ConfigureAppConfiguration(name, inMemoryConfigurationBuilder);
                             var source = inMemoryConfigurationBuilder.Build();
-                            _configurationSource = source;
+                            _configurationSources.AddOrUpdate(name, source, (_, __) => source);
                             b.Sources.Add(source);
 
-                            ConfigureAppConfiguration(ctx, b);
+                            ConfigureAppConfiguration(name, ctx, b);
                         })
                     ;
                 })

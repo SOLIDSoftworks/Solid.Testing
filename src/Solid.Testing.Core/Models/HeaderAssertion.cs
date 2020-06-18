@@ -8,15 +8,15 @@ using System.Runtime.CompilerServices;
 namespace Solid.Testing.Models
 {
     /// <summary>
-    /// A fluent header assertion
+    /// A fluent header assertion.
     /// </summary>
     public class HeaderAssertion : Assertion
     {
         /// <summary>
-        /// Create a header assertion
+        /// Create a <see cref="HeaderAssertion"/>.
         /// </summary>
         /// <param name="name">The name of the header</param>
-        /// <param name="assertion">The base assertion</param>
+        /// <param name="assertion">The base <see cref="Assertion"/>.</param>
         public HeaderAssertion(string name, Assertion assertion)
             : base(assertion.Request)
         {
@@ -26,7 +26,7 @@ namespace Solid.Testing.Models
 
         internal string Name { get; }
         /// <summary>
-        /// The base assertion
+        /// The base <see cref="Assertion"/>.
         /// </summary>
         public Assertion Assertion { get; }
     }

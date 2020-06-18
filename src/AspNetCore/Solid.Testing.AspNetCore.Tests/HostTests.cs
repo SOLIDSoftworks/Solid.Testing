@@ -2,6 +2,7 @@ using AspNetCoreApplication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Solid.Http;
 using Solid.Testing.AspNetCore.Extensions.XUnit;
 using System;
@@ -21,7 +22,29 @@ namespace Solid.Testing.AspNetCore.Tests
         public HostTests(TestingServerFixture<Startup> fixture, ITestOutputHelper output)
         {
             fixture.SetOutput(output);
+            fixture.UpdateConfiguration(builder =>
+            {
+                builder
+                    .SetDefaultLogLevel(LogLevel.Debug)
+                    .SetLogLevel("Solid", LogLevel.Trace)
+                ;
+            });
             _fixture = fixture;
+        }
+
+        [Theory]
+        [InlineData("custom-value")]
+        [InlineData("other-value")]
+        public async Task ShouldReadJsonConfigFromInMemorySource(string value)
+        {
+            _fixture.UpdateConfiguration(builder =>
+            {
+                builder.Add("ShouldReadConfigFromInMemorySource", section => section.Add("Value", value));
+            });
+
+            var response = await _fixture.TestingServer.GetAsync("ShouldReadConfigFromInMemorySource");
+            var text = await response.Content.ReadAsStringAsync();
+            Assert.Equal(value, text);
         }
 
         [Fact]
@@ -72,11 +95,29 @@ namespace Solid.Testing.AspNetCore.Tests
                     .Should(assertion)
                 ;
             }
-            catch(TrueException ex)
+            catch (TrueException ex)
             {
                 exception = ex;
             }
             Assert.NotNull(exception);
+        }
+
+        [Theory]
+        [InlineData(LogLevel.None)]
+        [InlineData(LogLevel.Trace)]
+        [InlineData(LogLevel.Debug)]
+        [InlineData(LogLevel.Information)]
+        [InlineData(LogLevel.Warning)]
+        [InlineData(LogLevel.Error)]
+        [InlineData(LogLevel.Critical)]
+        // make sure logging doesn't interfere
+        public async Task ShouldWorkOnAllLogLevels(LogLevel level)
+        {
+            _fixture.UpdateConfiguration(builder => builder.SetDefaultLogLevel(level), clear: true);
+            await _fixture.TestingServer
+                .GetAsync("ShouldReadJsonConfigFromTestFolder")
+                .ShouldRespondSuccessfully()
+            ;
         }
     }
 }

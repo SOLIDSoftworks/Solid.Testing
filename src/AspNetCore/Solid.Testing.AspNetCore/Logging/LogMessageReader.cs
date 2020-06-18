@@ -2,12 +2,13 @@
 using Solid.Testing.AspNetCore.Options;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Solid.Testing.AspNetCore.Logging
 {
-    internal class LogMessageReader
+    public class LogMessageReader
     {
         private AspNetCoreHostOptions _options;
         private IServiceProvider _services;
@@ -27,9 +28,15 @@ namespace Solid.Testing.AspNetCore.Logging
                 while (!_channel.Completed)
                 {
                     var message = await _channel.ReadAsync();
-                    _options.OnLogMessage?.Invoke(_services, message);
+                    try
+                    {
+                        _options.OnLogMessage?.Invoke(message);
+                    }
+                    catch { }
                 }
             }, TaskCreationOptions.LongRunning);
         }
+
+        public bool MessagesAvailable => _channel.MessagesWaiting;
     }
 }
