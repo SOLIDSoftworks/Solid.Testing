@@ -41,8 +41,38 @@ namespace Solid.Testing.AspNetCore.Factories
             services.AddSingleton<ILoggerProvider, ChannelLoggerProvider>();
             services.AddLogging(logging => logging.AddConfiguration(_configuration.GetSection("Logging")));
 
+            if (services.Any(s => s.ServiceType.Name.StartsWith("MvcMarker")))
+            {
+                var assemblies = GetApplicationParts(services);
+                var builder = services.AddMvcCore();
+                foreach (var assembly in assemblies)
+                {
+                    if (builder.PartManager.ApplicationParts.OfType<AssemblyPart>().Any(p => p.Assembly == assembly)) 
+                        continue;
+
+                    builder.AddApplicationPart(assembly);
+                }
+            }
 
             return services.BuildServiceProvider(options);
+        }
+
+        private IEnumerable<Assembly> GetApplicationParts(IServiceCollection services)
+        {
+            var assemblies = new Dictionary<string, Assembly>();
+            using (var temp = services.BuildServiceProvider())
+            {
+                var provider = temp.GetService<StartupTypeProvider>();
+                var type = provider.StartupType;
+                while(type != typeof(object))
+                {
+                    var assembly = type.Assembly;
+                    if (!assemblies.ContainsKey(assembly.FullName))
+                        assemblies.Add(assembly.FullName, assembly);
+                    type = type.BaseType;
+                }
+            }
+            return assemblies.Values;
         }
     }
 }

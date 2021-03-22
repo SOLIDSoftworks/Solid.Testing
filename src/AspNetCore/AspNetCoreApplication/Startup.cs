@@ -27,6 +27,7 @@ namespace AspNetCoreApplication
         {
             services.Configure<ApplicationOptions>(_configuration.GetSection("Options"), o => o.BindNonPublicProperties = false);
             services.AddLogging(logging => logging.ClearProviders());
+            services.AddMvc();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
