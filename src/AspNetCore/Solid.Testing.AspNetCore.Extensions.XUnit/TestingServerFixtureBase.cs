@@ -72,7 +72,7 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
         {
             options.OnLogMessage = context =>
             {
-                if (context.Properties.TryGetValue("id", out var id) && _helpers.TryGetValue((Guid)id, out var helper))
+                if (context != null && context.Properties.TryGetValue("id", out var id) && _helpers.TryGetValue((Guid)id, out var helper))
                     helper.WriteLine(context.Message);
             };
         }

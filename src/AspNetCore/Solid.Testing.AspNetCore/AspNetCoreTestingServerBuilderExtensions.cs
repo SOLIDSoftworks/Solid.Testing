@@ -72,17 +72,14 @@ namespace Solid.Http
 
             var c = new Action<IWebHostBuilder>(webHost =>
             {
+                configure(webHost);
                 webHost
                     .ConfigureServices((context, services) =>
                     {
-                        services.RemoveAll<LogMessageChannel>();
-                        services.AddSingleton(channel);
-                        services.AddSingleton<ILoggerProvider, ChannelLoggerProvider>();
-                        services.AddLogging(logging => logging.AddConfiguration(context.Configuration.GetSection("Logging")));
+                        var descriptor = ServiceDescriptor.Singleton<IServiceProviderFactory<IServiceCollection>>(new TestingServiceProviderFactory(context.Configuration, channel));
+                        services.Replace(descriptor);
                     })
                 ;
-
-                configure(webHost);
             });
 
             builder

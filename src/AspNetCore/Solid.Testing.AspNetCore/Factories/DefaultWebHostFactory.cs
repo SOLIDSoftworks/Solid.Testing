@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using System.Net;
 using Solid.Testing.AspNetCore.Logging;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Solid.Testing.AspNetCore.Providers;
 
 namespace Solid.Testing.AspNetCore.Factories
 {
@@ -25,6 +26,7 @@ namespace Solid.Testing.AspNetCore.Factories
         protected override IWebHostBuilder InitializeWebHostBuilder(Type startup, string hostname) =>
             new WebHostBuilder()
                 .UseKestrel(o => ConfigureKestrel(o, hostname))
+                .ConfigureServices(services => services.AddSingleton(new StartupTypeProvider { StartupType = startup }))
                 .UseStartup(startup)
             ;
 
