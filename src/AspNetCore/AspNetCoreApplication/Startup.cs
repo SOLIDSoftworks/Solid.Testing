@@ -16,13 +16,18 @@ namespace AspNetCoreApplication
 {
     public class Startup
     {
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
+        private IConfiguration _configuration;
+
+        public Startup(IConfiguration configuration)
         {
+            _configuration = configuration;
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.Configure<ApplicationOptions>(_configuration.GetSection("Options"), o => o.BindNonPublicProperties = false);
+        }
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app
@@ -45,9 +50,19 @@ namespace AspNetCoreApplication
                 .Use(async (context, next) =>
                 {
                     var path = ((string)context.Request.Path).Trim('/');
-                    var configuration = context.RequestServices.GetService<IConfiguration>();
-                    var section = configuration.GetSection(path);
-                    var value = section.GetValue<string>("Value");
+                    var value = null as string;
+                    if(path.Equals("options", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var options = context.RequestServices.GetService<IOptionsMonitor<ApplicationOptions>>();
+                        value = options.CurrentValue.Value;
+                    }
+                    else
+                    {
+                        var configuration = context.RequestServices.GetService<IConfiguration>();
+                        var section = configuration.GetSection(path);
+                        value = section.GetValue<string>("Value");
+                    }
+
                     var bytes = Encoding.UTF8.GetBytes(value);
                     context.Response.ContentType = "text/plain";
                     context.Response.ContentLength = value?.Length;

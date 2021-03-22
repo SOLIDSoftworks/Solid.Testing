@@ -35,6 +35,21 @@ namespace Solid.Testing.AspNetCore.Tests
         [Theory]
         [InlineData("custom-value")]
         [InlineData("other-value")]
+        public async Task ShouldReadOptionsFromInMemorySource(string value)
+        {
+            _fixture.UpdateConfiguration(builder =>
+            {
+                builder.Add("Options", section => section.Add("Value", value));
+            });
+
+            var response = await _fixture.TestingServer.GetAsync("Options");
+            var text = await response.Content.ReadAsStringAsync();
+            Assert.Equal(value, text);
+        }
+
+        [Theory]
+        [InlineData("custom-value")]
+        [InlineData("other-value")]
         public async Task ShouldReadJsonConfigFromInMemorySource(string value)
         {
             _fixture.UpdateConfiguration(builder =>

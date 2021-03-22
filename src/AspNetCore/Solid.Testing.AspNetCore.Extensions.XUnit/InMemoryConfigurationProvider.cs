@@ -41,7 +41,7 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
         {
             _data[key] = value;
             _changed = true;
-        }        
+        }
 
         public void Load()
         {

@@ -71,7 +71,6 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
 
         private InMemoryConfigurationBuilder Set(string path, string value)
         {
-
             InMemoryConfiguration[path] = value;
             return this;
         }
