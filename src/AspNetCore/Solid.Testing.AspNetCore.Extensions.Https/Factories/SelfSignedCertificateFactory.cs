@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -36,7 +37,9 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Factories
                 request.CertificateExtensions.Add(builder.Build());
 
                 var certificate = request.CreateSelfSigned(new DateTimeOffset(DateTime.UtcNow.AddDays(-1)), new DateTimeOffset(DateTime.UtcNow.AddDays(3650)));
-                certificate.FriendlyName = "Solid.Testing.AspNetCore";
+
+                if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    certificate.FriendlyName = "Solid.Testing.AspNetCore";
 
                 return new X509Certificate2(certificate.Export(X509ContentType.Pfx));
             }
