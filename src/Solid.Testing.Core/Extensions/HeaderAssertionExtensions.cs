@@ -33,7 +33,7 @@ namespace Solid.Http
         /// <returns>A header assertion</returns>
         public static HeaderAssertion WithValue(this HeaderAssertion assertion, string value, IEqualityComparer<string> comparer)
         {
-            return assertion.WithValueComparer(values => values.Contains(value, comparer), "Expected value '{value}' not found.");
+            return assertion.WithValueComparer(values => values.Contains(value, comparer), $"Expected value '{value}' not found.");
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Solid.Http
         /// <returns>A header assertion</returns>
         public static HeaderAssertion WithValueStartingWith(this HeaderAssertion assertion, string value, StringComparison comparison)
         {
-            return assertion.WithValueComparer(values => values.Any(v => v.StartsWith(value, comparison)), "Expected value starting with '{value}' not found.");
+            return assertion.WithValueComparer(values => values.Any(v => v.StartsWith(value, comparison)), $"Expected value starting with '{value}' not found.");
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Solid.Http
         /// <returns>A header assertion</returns>
         public static HeaderAssertion WithValueEndingWith(this HeaderAssertion assertion, string value, StringComparison comparison)
         {
-            return assertion.WithValueComparer(values => values.Any(v => v.EndsWith(value, comparison)), "Expected value starting with '{value}' not found.");
+            return assertion.WithValueComparer(values => values.Any(v => v.EndsWith(value, comparison)), $"Expected value starting with '{value}' not found.");
         }
 
         private static HeaderAssertion WithValueComparer(this HeaderAssertion assertion, Func<IEnumerable<string>, bool> compare, string message)
