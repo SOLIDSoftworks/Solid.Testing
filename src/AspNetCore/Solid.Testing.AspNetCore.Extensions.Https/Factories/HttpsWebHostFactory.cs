@@ -31,9 +31,7 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Factories
             {
                 https.ServerCertificate = certificate;
                 https.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
-#if NETCOREAPP3_1
                 https.AllowAnyClientCertificate();
-#endif
             }));
         }
     }

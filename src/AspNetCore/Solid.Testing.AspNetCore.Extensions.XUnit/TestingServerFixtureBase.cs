@@ -30,6 +30,17 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
             _helpers.AddOrUpdate(_localGuid.Value, output, (_, __) => output);
         }
 
+        public bool WriteLine(string message)
+        {
+            if (_helpers.TryGetValue(_localGuid.Value, out var helper))
+            {
+                helper.WriteLine(message);
+                return true;
+            }
+
+            return false;
+        }
+
         protected void ConfigureRequiredServices(IServiceCollection services)
         {
             services.AddHttpContextAccessor();
@@ -56,12 +67,16 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
                             var g = _localGuid.Value;
                             request.WithHeader("x-output-id", g.ToString());
                         });
+                        options.OnHttpRequest(request =>
+                        {
+                            WriteLine("------------------ Start request ------------------");
+                        });
                         options.OnHttpResponse(async (s, r) =>
                         {
                             var channel = s.GetRequiredService<LogMessageChannel>();
                             if (channel.MessagesWaiting)
                                 await Task.Delay(50);
-                            _helpers.TryRemove(_localGuid.Value, out _);
+                            WriteLine("------------------ End request ------------------");
                         });
                     });
                 })

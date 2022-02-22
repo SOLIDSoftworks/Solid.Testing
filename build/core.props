@@ -1,0 +1,7 @@
+<Project>
+    <PropertyGroup>
+        <TargetFrameworks>netcoreapp3.1;net5;net6.0</TargetFrameworks>
+        <LangVersion>8.0</LangVersion>
+    </PropertyGroup>
+    <Import Project="common.props" />
+</Project>

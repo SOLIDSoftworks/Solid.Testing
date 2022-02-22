@@ -34,6 +34,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Solid.Testing.Owin", "Owin\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solid.Testing.AspNetCore.Extensions.XUnit", "AspNetCore\Solid.Testing.AspNetCore.Extensions.XUnit\Solid.Testing.AspNetCore.Extensions.XUnit.csproj", "{A745B363-18F9-498C-BA30-5C58820C0974}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{74F40EEC-B0CB-4803-8066-6F2840A1DA19}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\standard.props = ..\build\standard.props
+		..\build\core.props = ..\build\core.props
+		..\build\common.props = ..\build\common.props
+		..\build\framework.props = ..\build\framework.props
+		..\build\all.props = ..\build\all.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +94,7 @@ Global
 		{6549BCD4-A172-41B9-8158-9EDBC6410D59} = {6E1B6645-4669-4285-A507-A56BB7AFBC12}
 		{E8D99090-85D0-4CD9-BCD9-63FC4435BCF4} = {A7320763-DD15-444B-8300-471675910B2C}
 		{A745B363-18F9-498C-BA30-5C58820C0974} = {0C0CA734-5E37-43A0-8776-647CF33F6526}
+		{74F40EEC-B0CB-4803-8066-6F2840A1DA19} = {516915BB-AD00-46B6-ADE2-0960B04FE61E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {80D0C5D2-65E9-47C1-9897-CC3CB3E93CA3}

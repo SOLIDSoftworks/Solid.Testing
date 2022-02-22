@@ -1,22 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
-    <IsPackable>true</IsPackable>
-    <VersionPrefix></VersionPrefix>
-    <AssemblyVersion></AssemblyVersion>
-    <FileVersion></FileVersion>
-    <InformationalVersion></InformationalVersion>
-  </PropertyGroup>
-  
-  <PropertyGroup>
-    <DocumentationFile>Solid.Testing.AspNetCore.Extensions.Https.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <ItemGroup Condition="$(TargetFramework) == 'net472'">
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
-  </ItemGroup>
-  
+  <Import Project="../../../build/core.props" />  
   <ItemGroup>
     <ProjectReference Include="..\Solid.Testing.AspNetCore\Solid.Testing.AspNetCore.csproj" />
   </ItemGroup>

@@ -1,0 +1,7 @@
+<Project>
+    <PropertyGroup>
+        <TargetFrameworks>net461;net472</TargetFrameworks>
+        <LangVersion>8.0</LangVersion>
+    </PropertyGroup>
+    <Import Project="common.props" />
+</Project>

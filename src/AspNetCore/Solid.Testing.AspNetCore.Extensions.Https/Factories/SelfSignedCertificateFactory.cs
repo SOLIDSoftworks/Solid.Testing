@@ -27,21 +27,27 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Factories
             {
                 var request = new CertificateRequest(dn, rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
 
-                request.CertificateExtensions.Add(
-                    new X509KeyUsageExtension(X509KeyUsageFlags.DataEncipherment | X509KeyUsageFlags.KeyEncipherment | X509KeyUsageFlags.DigitalSignature, false));
+                var usage = new X509KeyUsageExtension(X509KeyUsageFlags.DataEncipherment | X509KeyUsageFlags.KeyEncipherment | X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.KeyAgreement, true);
+                request.CertificateExtensions.Add(usage);
+
+                var oids = new OidCollection
+                {
+                    new Oid("1.3.6.1.5.5.7.3.1"), // Server authentication
+                    new Oid("1.3.6.1.5.5.7.3.2") // Client authentication
+                };
 
                 request.CertificateExtensions.Add(
-                   new X509EnhancedKeyUsageExtension(
-                       new OidCollection { new Oid("1.3.6.1.5.5.7.3.1") }, false));
+                    new X509EnhancedKeyUsageExtension(oids, false));
 
                 request.CertificateExtensions.Add(builder.Build());
 
-                var certificate = request.CreateSelfSigned(new DateTimeOffset(DateTime.UtcNow.AddDays(-1)), new DateTimeOffset(DateTime.UtcNow.AddDays(3650)));
-
+                var certificate = request.CreateSelfSigned(new DateTimeOffset(DateTime.UtcNow.AddDays(-1)), new DateTimeOffset(DateTime.UtcNow.AddDays(1)));
+                
                 if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     certificate.FriendlyName = "Solid.Testing.AspNetCore";
-
-                return new X509Certificate2(certificate.Export(X509ContentType.Pfx));
+                
+                var bytes = certificate.Export(X509ContentType.Pfx);
+                return new X509Certificate2(bytes, null as string, X509KeyStorageFlags.Exportable);
             }
         }
     }

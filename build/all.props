@@ -1,0 +1,8 @@
+<Project>
+    <PropertyGroup>
+        <!-- net461 is omitted here because it doesn't support all APIs -->
+        <TargetFrameworks>netcoreapp3.1;net5;net6.0;net472</TargetFrameworks>
+        <LangVersion>8.0</LangVersion>
+    </PropertyGroup>
+    <Import Project="common.props" />
+</Project>

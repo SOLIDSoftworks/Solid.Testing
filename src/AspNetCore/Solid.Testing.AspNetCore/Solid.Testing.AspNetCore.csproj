@@ -1,29 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;netstandard2.0</TargetFrameworks>
-    <IsPackable>true</IsPackable>
-    <VersionPrefix></VersionPrefix>
-    <AssemblyVersion></AssemblyVersion>
-    <FileVersion></FileVersion>
-    <InformationalVersion></InformationalVersion>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <DocumentationFile>Solid.Testing.AspNetCore.xml</DocumentationFile>
-  </PropertyGroup>
-
-
-  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.1.7" />
-    <PackageReference Include="System.Threading.Channels" Version="4.7.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-  </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework) == 'netcoreapp3.1'">
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
+  <Import Project="../../../build/core.props" />
   <ItemGroup>
     <ProjectReference Include="..\..\Solid.Testing.Core\Solid.Testing.Core.csproj" />
   </ItemGroup>

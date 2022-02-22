@@ -1,25 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Solid.Testing</RootNamespace>
-    <IsPackable>true</IsPackable>
-    <VersionPrefix></VersionPrefix>
-    <AssemblyVersion></AssemblyVersion>
-    <FileVersion></FileVersion>
-    <InformationalVersion></InformationalVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Solid.Testing.Core.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Solid.Testing.Core.xml</DocumentationFile>
-  </PropertyGroup>
-
+  <Import Project="../../build/standard.props" />
   <ItemGroup>
     <PackageReference Include="Solid.Http" Version="3.0.12" />
   </ItemGroup>
-
 </Project>

@@ -33,7 +33,7 @@ namespace AspNetCoreApplication
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app
-                .Use((context, next) =>
+                .Use((HttpContext context, Func<Task> next) =>
                 {
                     var options = context.RequestServices.GetService<IOptionsSnapshot<LoggerFilterOptions>>().Value;
                     var factory = context.RequestServices.GetService<ILoggerFactory>();
@@ -49,7 +49,7 @@ namespace AspNetCoreApplication
 
                     return next();
                 })
-                .Use(async (context, next) =>
+                .Use(async (HttpContext context, Func<Task> next) =>
                 {
                     var path = ((string)context.Request.Path).Trim('/');
                     var value = null as string;

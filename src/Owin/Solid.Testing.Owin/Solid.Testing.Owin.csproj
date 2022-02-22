@@ -1,21 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
-    <IsPackable>true</IsPackable>
-    <VersionPrefix></VersionPrefix>
-    <AssemblyVersion></AssemblyVersion>
-    <FileVersion></FileVersion>
-    <InformationalVersion></InformationalVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Solid.Testing.Owin.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Solid.Testing.Owin.xml</DocumentationFile>
-  </PropertyGroup>
+  <Import Project="../../../build/framework.props" />
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Owin.Host.HttpListener" Version="3.0.0" />

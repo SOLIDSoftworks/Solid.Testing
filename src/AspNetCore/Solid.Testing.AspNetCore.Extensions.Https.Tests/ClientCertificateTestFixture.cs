@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Security;
+using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
@@ -23,10 +25,30 @@ namespace Solid.Testing.AspNetCore.Extensions.Https.Tests
                         .AddHttpClient("localhost")
                         .ConfigureHttpMessageHandlerBuilder(builder =>
                         {
-                            var certificate = new X509Certificate2(Convert.FromBase64String(ClientCertificateBase64));
-                            var handler = builder.PrimaryHandler as HttpClientHandler;
-                            handler.ClientCertificates.Add(certificate);
-                            handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+                            var certificate = new X509Certificate2(Convert.FromBase64String(ClientCertificateBase64), null as string);
+                            if (builder.PrimaryHandler is HttpClientHandler httpClientHandler)
+                            {
+                                WriteLine("Adding client certificate to HttpClientHandler");
+                                httpClientHandler.ClientCertificates.Add(certificate);
+                                httpClientHandler.SslProtocols = SslProtocols.Tls12;
+                                httpClientHandler.ClientCertificateOptions = ClientCertificateOption.Manual;
+                                WriteLine("Client certificate added");
+                            }
+
+                            if (builder.PrimaryHandler is SocketsHttpHandler socketsHttpHandler)
+                            {
+                                WriteLine("Adding client certificate to SocketsHttpHandler");
+                                socketsHttpHandler.SslOptions = new SslClientAuthenticationOptions
+                                {
+                                    ClientCertificates = new X509CertificateCollection()
+                                    {
+                                        certificate
+                                    },
+                                    LocalCertificateSelectionCallback = (sender, target, localCertificates,
+                                        remoteCertificates, acceptedIssuers) => localCertificates.OfType<X509Certificate2>().FirstOrDefault()
+                                };
+                                WriteLine("Client certificate added");
+                            }
                         })
                     ;
                 }), configure)

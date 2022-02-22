@@ -1,0 +1,60 @@
+<Project>
+    <PropertyGroup>
+        <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+        <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".Core", ""))</RootNamespace>
+
+        <!-- TODO: find a way to auto-populate the year from DateTime.Now -->
+        <Copyright>©2022 SOLID Softworks. All rights reserved.</Copyright>
+        <Authors>SOLID Softworks</Authors>
+        <Company>SOLID Softworks</Company>
+        <OutputTypeEx>library</OutputTypeEx>
+        <Product>SOLID Testing</Product>
+        <RepositoryType>git</RepositoryType>
+        <PackageProjectUrl>https://github.com/SOLIDSoftworks/Solid.Testing</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/SOLIDSoftworks/Solid.Testing</RepositoryUrl>
+
+        <!-- <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release' AND '$(IsPackable)' != 'false'">true</TreatWarningsAsErrors>-->
+        <!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+    <PropertyGroup>
+        <DocumentationFile Condition="'$(IsPackable)' != 'false'">bin/$(Configuration)/$(TargetFramework)/$(AssemblyName).xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IsNetStandard Condition="$(TargetFramework) == 'netstandard2.0'">true</IsNetStandard>
+        <IsNetStandard Condition="$(TargetFramework) != 'netstandard2.0'">false</IsNetStandard>
+        <IsNetCoreApp3_1 Condition="$(TargetFramework) == 'netcoreapp3.1'">true</IsNetCoreApp3_1>
+        <IsNetCoreApp3_1 Condition="$(TargetFramework) != 'netcoreapp3.1'">false</IsNetCoreApp3_1>
+        <IsNet5 Condition="$(TargetFramework) == 'net5'">true</IsNet5>
+        <IsNet5 Condition="$(TargetFramework) != 'net5'">false</IsNet5>
+        <IsNet6_0 Condition="$(TargetFramework) == 'net6.0'">true</IsNet6_0>
+        <IsNet6_0 Condition="$(TargetFramework) != 'net6.0'">false</IsNet6_0>
+        <IsNetFramework Condition="$(TargetFramework) == 'net461' OR $(TargetFramework) == 'net472' ">true</IsNetFramework>
+        <IsNetFramework Condition="$(TargetFramework) != 'net461' AND $(TargetFramework) != 'net472' ">false</IsNetFramework>
+
+        <MicrosoftExtensionVersion Condition="$(IsNetCoreApp3_1)">3.1.*</MicrosoftExtensionVersion>
+        <MicrosoftExtensionVersion Condition="$(IsNet5)">5.0.*</MicrosoftExtensionVersion>
+        <MicrosoftExtensionVersion Condition="$(IsNet6_0)">6.0.*</MicrosoftExtensionVersion>
+        <MicrosoftExtensionVersion Condition="$(IsNetStandard)">6.0.*</MicrosoftExtensionVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(IsNetStandard) == 'false'">
+        <NoWarn>$(NoWarn);NETSDK1086</NoWarn>
+    </PropertyGroup>
+    <ItemGroup Condition="$(IsNetStandard) == 'false' AND $(IsNetFramework) == 'false'">
+        <FrameworkReference Condition="$(AssemblyName.Contains('AspNetCore')) == 'true'" Include="Microsoft.AspNetCore.App" />
+        <FrameworkReference Condition="$(AssemblyName.Contains('AspNetCore')) == 'false'" Include="Microsoft.NetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <!-- Moq -->
+            <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(MSBuildProjectName).Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+</Project>
