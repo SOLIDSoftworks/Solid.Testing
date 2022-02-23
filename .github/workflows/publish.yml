@@ -50,5 +50,5 @@ jobs:
       - name: package
         run: dotnet pack ./src --configuration Release --no-build -p:Version=${{ steps.semver.outputs.semantic-version }} -o ./ 
         
-      #- name: push
-      #  run: dotnet nuget push *.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
+      - name: push
+        run: dotnet nuget push *.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
