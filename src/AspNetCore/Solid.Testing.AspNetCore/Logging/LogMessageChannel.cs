@@ -32,14 +32,15 @@ namespace Solid.Testing.AspNetCore.Logging
                 _messages++;
         }
 
-        public ValueTask<LogMessageContext> ReadAsync()
+        public async ValueTask<LogMessageContext> ReadAsync()
         {
-            var read = _channel.Reader.TryRead(out var context);
-            if(read)
-                _messages--;
-            return new ValueTask<LogMessageContext>(context);
+            if (!await _channel.Reader.WaitToReadAsync()) 
+                return null;
+            var context = await _channel.Reader.ReadAsync();
+            _messages--;
+            return context;
         }
-             
+        
         public void Dispose() => _ = _channel.Writer.TryComplete();
 
         public bool MessagesWaiting => _messages > 0;

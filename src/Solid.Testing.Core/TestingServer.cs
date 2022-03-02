@@ -52,7 +52,7 @@ namespace Solid.Http
                 _client = Provider.GetService<ISolidHttpClientFactory>().CreateWithBaseAddress(BaseAddress);
                 _client.OnRequestCreated(request => request.OnHttpResponse(_ => _client = null));
             }
-            return _client;            
+            return _client;
         }
 
         /// <summary>

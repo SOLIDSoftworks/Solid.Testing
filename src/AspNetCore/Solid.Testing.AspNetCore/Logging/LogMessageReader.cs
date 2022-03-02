@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Solid.Testing.AspNetCore.Logging
@@ -25,18 +26,24 @@ namespace Solid.Testing.AspNetCore.Logging
         {
             _ = Task.Factory.StartNew(async () =>
             {
-                while (!_channel.Completed)
-                {
-                    var message = await _channel.ReadAsync();
-                    try
-                    {
-                        _options.OnLogMessage?.Invoke(message);
-                    }
-                    catch { }
-                }
+                await ReadMessagesAsync();
             }, TaskCreationOptions.LongRunning);
         }
 
         public bool MessagesAvailable => _channel.MessagesWaiting;
+
+        private async Task ReadMessagesAsync()
+        {
+            while (!_channel.Completed)
+            {
+                var message = await _channel.ReadAsync();
+                if (message == null) break; // can't read
+                try
+                {
+                    _options.OnLogMessage?.Invoke(message);
+                }
+                catch { }
+            }
+        }
     }
 }
