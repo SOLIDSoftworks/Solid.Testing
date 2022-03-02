@@ -74,8 +74,8 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
                         options.OnHttpResponse(async (s, r) =>
                         {
                             var channel = s.GetRequiredService<LogMessageChannel>();
-                            if (channel.MessagesWaiting)
-                                await Task.Delay(50);
+                            while (channel.MessagesWaiting)
+                                await Task.Delay(10);
                             WriteLine("------------------ End request ------------------");
                         });
                     });

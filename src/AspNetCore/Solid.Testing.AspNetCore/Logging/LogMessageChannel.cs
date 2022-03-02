@@ -43,6 +43,6 @@ namespace Solid.Testing.AspNetCore.Logging
         
         public void Dispose() => _ = _channel.Writer.TryComplete();
 
-        public bool MessagesWaiting => _messages > 0;
+        public bool MessagesWaiting => _messages > 0 && !Completed;
     }
 }
