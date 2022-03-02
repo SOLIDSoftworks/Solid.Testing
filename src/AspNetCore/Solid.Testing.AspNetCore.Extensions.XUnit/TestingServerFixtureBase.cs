@@ -7,6 +7,7 @@ using Solid.Testing.AspNetCore.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,8 +17,10 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
 {
     public abstract class TestingServerFixtureBase 
     {
-        private ConcurrentDictionary<Guid, ITestOutputHelper> _helpers;
-        private AsyncLocal<Guid> _localGuid = new AsyncLocal<Guid>();
+        private readonly ConcurrentDictionary<Guid, ITestOutputHelper> _helpers;
+        private readonly AsyncLocal<Guid> _localOutputId = new AsyncLocal<Guid>();
+        protected Guid OutputId => _localOutputId.Value;
+        protected virtual string OutputIdHeaderName => "x-output-id";
         
         protected TestingServerFixtureBase()
         {
@@ -26,13 +29,13 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
 
         public void SetOutput(ITestOutputHelper output)
         {
-            _localGuid.Value = Guid.NewGuid();
-            _helpers.AddOrUpdate(_localGuid.Value, output, (_, __) => output);
+            _localOutputId.Value = Guid.NewGuid();
+            _helpers.AddOrUpdate(OutputId, output, (_, __) => output);
         }
 
         public bool WriteLine(string message)
         {
-            if (_helpers.TryGetValue(_localGuid.Value, out var helper))
+            if (_helpers.TryGetValue(OutputId, out var helper))
             {
                 helper.WriteLine(message);
                 return true;
@@ -49,7 +52,7 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
                 options.OnCreatingLogMessage = (provider, context) =>
                 {
                     var accessor = provider.GetRequiredService<IHttpContextAccessor>();
-                    if (accessor.HttpContext?.Request.Headers.TryGetValue("x-output-id", out var id) == true)
+                    if (accessor.HttpContext?.Request.Headers.TryGetValue(OutputIdHeaderName, out var id) == true)
                         context.Properties.Add("id", Guid.Parse(id));
                 };
             });
@@ -62,25 +65,31 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
                 {
                     builder.Configure(options =>
                     {
-                        options.OnRequestCreated(request =>
-                        {
-                            var g = _localGuid.Value;
-                            request.WithHeader("x-output-id", g.ToString());
-                        });
-                        options.OnHttpRequest(request =>
-                        {
-                            WriteLine("------------------ Start request ------------------");
-                        });
-                        options.OnHttpResponse(async (s, r) =>
-                        {
-                            var channel = s.GetRequiredService<LogMessageChannel>();
-                            while (channel.MessagesWaiting)
-                                await Task.Delay(10);
-                            WriteLine("------------------ End request ------------------");
-                        });
+                        options.OnRequestCreated(ConfigureRequest);
+                        options.OnHttpRequest(LogRequestStartAsync);
+                        options.OnHttpResponse(LogRequestEndAsync);
                     });
                 })
             ;
+        }
+
+        protected virtual void ConfigureRequest(ISolidHttpRequest request)
+        {
+            request.WithHeader(OutputIdHeaderName, OutputId.ToString());
+        }
+
+        protected virtual ValueTask LogRequestStartAsync(IServiceProvider services, HttpRequestMessage request)
+        {
+            WriteLine("------------------ Start request ------------------");
+            return new ValueTask();
+        }
+
+        protected virtual async ValueTask LogRequestEndAsync(IServiceProvider services, HttpResponseMessage response)
+        {
+            var channel = services.GetRequiredService<LogMessageChannel>();
+            while (channel.MessagesWaiting)
+                await Task.Delay(10);
+            WriteLine("------------------ End request ------------------");
         }
 
         protected virtual void ConfigureAspNetCoreHost(AspNetCoreHostOptions options)
