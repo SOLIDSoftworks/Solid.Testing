@@ -87,8 +87,21 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
         protected virtual async ValueTask LogRequestEndAsync(IServiceProvider services, HttpResponseMessage response)
         {
             var channel = services.GetRequiredService<LogMessageChannel>();
+            var maxWait = TimeSpan.FromMilliseconds(500);
+            var maxWaitAfterCompletion = TimeSpan.FromMilliseconds(100);
+            var interval = TimeSpan.FromMilliseconds(10);
+            var wait = TimeSpan.Zero;
+            var waitAfterCompletion = TimeSpan.Zero;
             while (channel.MessagesWaiting)
-                await Task.Delay(10);
+            {
+                await Task.Delay(interval);
+                if (channel.Completed)
+                    waitAfterCompletion = waitAfterCompletion.Add(interval);
+                wait = wait.Add(interval);
+                if (wait > maxWait) break;
+                if (waitAfterCompletion > maxWaitAfterCompletion) break;
+            }
+
             WriteLine("------------------ End request ------------------");
         }
 

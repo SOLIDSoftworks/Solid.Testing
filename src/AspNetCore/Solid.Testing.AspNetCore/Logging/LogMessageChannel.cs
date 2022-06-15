@@ -28,7 +28,7 @@ namespace Solid.Testing.AspNetCore.Logging
 
         public void Enqueue(LogMessageContext message)
         {
-            if (_channel.Writer.TryWrite(message))
+            if (!Completed && _channel.Writer.TryWrite(message))
                 _messages++;
         }
 
@@ -40,9 +40,13 @@ namespace Solid.Testing.AspNetCore.Logging
             _messages--;
             return context;
         }
-        
-        public void Dispose() => _ = _channel.Writer.TryComplete();
 
-        public bool MessagesWaiting => _messages > 0 && !Completed;
+        public void Dispose()
+        {
+            if (!_channel.Writer.TryComplete())
+                Completed = true;
+        }
+
+        public bool MessagesWaiting => _messages > 0;
     }
 }
