@@ -23,7 +23,12 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
         private readonly ConcurrentDictionary<string, ITestOutputHelper> _helpers;
         private readonly AsyncLocal<string> _localTraceId = new AsyncLocal<string>();
         private static readonly string SpanId = ActivitySpanId.CreateRandom().ToHexString();
-        protected string TraceParent => $"00-{_localTraceId.Value}-{SpanId}-00";
+        public string TraceId => _localTraceId.Value;
+        public string TraceParent => _localTraceId.Value != null ? $"00-{_localTraceId.Value}-{SpanId}-00" : null;
+        protected virtual string OutputIdHeaderName => "x-output-id";
+        
+        [Obsolete]
+        protected Guid OutputId => Guid.TryParse(_localTraceId.Value, out var guid) ? guid : Guid.Empty;
         
         protected TestingServerFixtureBase()
         {
@@ -56,6 +61,16 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
                 options.OnCreatingLogMessage = (provider, context) =>
                 {
                     var accessor = provider.GetRequiredService<IHttpContextAccessor>();
+                    var http = accessor.HttpContext;
+                    if (http?.Request.Headers.TryGetValue(OutputIdHeaderName, out var id) == true)
+                    {
+                        context.Properties.Add("id", Guid.Parse(id));
+                        return;
+                    }
+                    
+                    if(http == null)
+                        context.Properties.Add("background", true);
+
                     var activity = Activity.Current;
                     if (activity == null) return;
                     context.Properties.Add("id", activity.TraceId.ToHexString());
@@ -80,7 +95,20 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
 
         protected virtual void ConfigureRequest(ISolidHttpRequest request)
         {
-            request.WithHeader(HeaderNames.TraceParent, TraceParent);
+            var traceParent = TraceParent;
+            if(traceParent != null)
+                request.WithHeader(HeaderNames.TraceParent, traceParent);
+        }
+
+        public void OverrideTraceId(ActivityTraceId traceId)
+            => OverrideTraceId(traceId.ToHexString());
+        
+        public void OverrideTraceId(string traceId)
+        {
+            var previous = _localTraceId.Value;
+            _localTraceId.Value = traceId;
+            if (_helpers.TryGetValue(previous, out var helper))
+                _helpers.AddOrUpdate(traceId, helper, (key, _) => helper);
         }
 
         protected virtual ValueTask LogRequestStartAsync(IServiceProvider services, HttpRequestMessage request)
@@ -110,12 +138,27 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
             WriteLine("------------------ End request ------------------");
         }
 
+        private bool _background = false;
         protected virtual void ConfigureAspNetCoreHost(AspNetCoreHostOptions options)
         {
             options.OnLogMessage = context =>
             {
-                if (context != null && context.Properties.TryGetValue("id", out var obj) && obj is string id && _helpers.TryGetValue(id, out var helper))
+                if (context != null && context.Properties.TryGetValue("id", out var obj1) && obj1 is string id && _helpers.TryGetValue(id, out var helper))
+                {
+                    if (context.Properties.TryGetValue("background", out var obj2) && obj2 is true)
+                    {
+                        if(!_background)
+                            WriteLine("------------------ Start background task log ------------------");
+                        _background = true;
+                    }
+                    else if (_background)
+                    {
+                        WriteLine("------------------ End background task log ------------------");
+                        _background = false;
+                    }
+
                     helper.WriteLine(context.Message);
+                }
             };
         }
 
