@@ -7,35 +7,39 @@ using Solid.Testing.AspNetCore.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Net.Http.Headers;
 using Xunit.Abstractions;
 
 namespace Solid.Testing.AspNetCore.Extensions.XUnit
 {
     public abstract class TestingServerFixtureBase 
     {
-        private readonly ConcurrentDictionary<Guid, ITestOutputHelper> _helpers;
-        private readonly AsyncLocal<Guid> _localOutputId = new AsyncLocal<Guid>();
-        protected Guid OutputId => _localOutputId.Value;
-        protected virtual string OutputIdHeaderName => "x-output-id";
+        private readonly ConcurrentDictionary<string, ITestOutputHelper> _helpers;
+        private readonly AsyncLocal<string> _localTraceId = new AsyncLocal<string>();
+        private static readonly string SpanId = ActivitySpanId.CreateRandom().ToHexString();
+        protected string TraceParent => $"00-{_localTraceId.Value}-{SpanId}-00";
         
         protected TestingServerFixtureBase()
         {
-            _helpers = new ConcurrentDictionary<Guid, ITestOutputHelper>();
+            _helpers = new ConcurrentDictionary<string, ITestOutputHelper>();
         }
 
         public void SetOutput(ITestOutputHelper output)
         {
-            _localOutputId.Value = Guid.NewGuid();
-            _helpers.AddOrUpdate(OutputId, output, (_, __) => output);
+            var traceId = ActivityTraceId.CreateRandom().ToHexString();
+            _localTraceId.Value = traceId;
+            _helpers.AddOrUpdate(traceId, output, (_, __) => output);
         }
 
         public bool WriteLine(string message)
         {
-            if (_helpers.TryGetValue(OutputId, out var helper))
+            if (_helpers.TryGetValue(_localTraceId.Value, out var helper))
             {
                 helper.WriteLine(message);
                 return true;
@@ -52,8 +56,9 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
                 options.OnCreatingLogMessage = (provider, context) =>
                 {
                     var accessor = provider.GetRequiredService<IHttpContextAccessor>();
-                    if (accessor.HttpContext?.Request.Headers.TryGetValue(OutputIdHeaderName, out var id) == true)
-                        context.Properties.Add("id", Guid.Parse(id));
+                    var activity = Activity.Current;
+                    if (activity == null) return;
+                    context.Properties.Add("id", activity.TraceId.ToHexString());
                 };
             });
         }
@@ -75,7 +80,7 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
 
         protected virtual void ConfigureRequest(ISolidHttpRequest request)
         {
-            request.WithHeader(OutputIdHeaderName, OutputId.ToString());
+            request.WithHeader(HeaderNames.TraceParent, TraceParent);
         }
 
         protected virtual ValueTask LogRequestStartAsync(IServiceProvider services, HttpRequestMessage request)
@@ -109,7 +114,7 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
         {
             options.OnLogMessage = context =>
             {
-                if (context != null && context.Properties.TryGetValue("id", out var id) && _helpers.TryGetValue((Guid)id, out var helper))
+                if (context != null && context.Properties.TryGetValue("id", out var obj) && obj is string id && _helpers.TryGetValue(id, out var helper))
                     helper.WriteLine(context.Message);
             };
         }

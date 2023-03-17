@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging;
 using Solid.Http;
 using Solid.Testing.AspNetCore.Extensions.XUnit;
 using System;
+using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +32,33 @@ namespace Solid.Testing.AspNetCore.Tests
                 ;
             });
             _fixture = fixture;
+        }
+
+        [Fact]
+        public async Task LoggingTest()
+        {
+            var created = await _fixture
+                .TestingServer
+                .PostAsync("backgroundtasks")
+            ;
+            var id = await created.Content.ReadAsStringAsync();
+
+            var complete = false;
+            while (!complete)
+            {
+                await Task.Delay(500);
+                var poll = await _fixture
+                    .TestingServer
+                    .GetAsync("backgroundtasks/{id}")
+                    .WithNamedParameter("id", id);
+
+                if (poll.StatusCode == HttpStatusCode.NotFound) 
+                    Assert.True(false);
+
+                var content = await poll.Content.ReadAsStringAsync();
+                if (bool.TryParse(content, out var parsed))
+                    complete = parsed;
+            }
         }
 
         [Theory]
