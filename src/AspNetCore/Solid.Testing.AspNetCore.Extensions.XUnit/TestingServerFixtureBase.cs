@@ -8,9 +8,11 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography.Xml;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Net.Http.Headers;
@@ -62,14 +64,15 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
                 {
                     var accessor = provider.GetRequiredService<IHttpContextAccessor>();
                     var http = accessor.HttpContext;
-                    if (http?.Request.Headers.TryGetValue(OutputIdHeaderName, out var id) == true)
-                    {
-                        context.Properties.Add("id", Guid.Parse(id));
-                        return;
-                    }
                     
                     if(http == null)
                         context.Properties.Add("background", true);
+                    
+                    if (http?.Request.Headers.TryGetValue(OutputIdHeaderName, out var id) == true)
+                    {
+                        context.Properties.Add("id", id);
+                        return;
+                    }
 
                     var activity = Activity.Current;
                     if (activity == null) return;
@@ -96,8 +99,26 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
         protected virtual void ConfigureRequest(ISolidHttpRequest request)
         {
             var traceParent = TraceParent;
-            if(traceParent != null)
-                request.WithHeader(HeaderNames.TraceParent, traceParent);
+            if (traceParent != null)
+                request.OnHttpRequest(http =>
+                {
+                    if (http.Headers.TryGetValues(HeaderNames.TraceParent, out var values))
+                    {
+                        var value = values.First();
+                        var match = Regex.Match(value, "^00-([^-]*)-[^-]*-0[01]$");
+                        if (!match.Success)
+                        {
+                            http.Headers.Remove(HeaderNames.TraceParent);
+                        }
+                        else
+                        {
+                            var traceId = match.Groups[1].Value;
+                            OverrideTraceId(traceId);
+                            return;
+                        }
+                    }
+                    http.Headers.Add(HeaderNames.TraceParent, TraceParent);
+                });
         }
 
         public void OverrideTraceId(ActivityTraceId traceId)
@@ -113,7 +134,12 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
 
         protected virtual ValueTask LogRequestStartAsync(IServiceProvider services, HttpRequestMessage request)
         {
-            WriteLine("------------------ Start request ------------------");
+            if (_background)
+            {
+                WriteLine("------------------ /background_task ------------------");
+                _background = false;
+            }
+            WriteLine("------------------- http_request ------------------");
             return new ValueTask();
         }
 
@@ -135,7 +161,7 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
                 if (waitAfterCompletion > maxWaitAfterCompletion) break;
             }
 
-            WriteLine("------------------ End request ------------------");
+            WriteLine("------------------ /http_request ------------------");
         }
 
         private bool _background = false;
@@ -143,22 +169,26 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
         {
             options.OnLogMessage = context =>
             {
-                if (context != null && context.Properties.TryGetValue("id", out var obj1) && obj1 is string id && _helpers.TryGetValue(id, out var helper))
+                if (context == null) return;
+                if (!context.Properties.TryGetValue("id", out var idObj)) return;
+                if (!(idObj is string id)) return;
+                if (Guid.TryParse(id, out var guid))
+                    id = guid.ToString("N"); 
+                if (!_helpers.TryGetValue(id, out var helper)) return;
+                
+                if (context.Properties.TryGetValue("background", out var bgObj) && bgObj is true)
                 {
-                    if (context.Properties.TryGetValue("background", out var obj2) && obj2 is true)
-                    {
-                        if(!_background)
-                            WriteLine("------------------ Start background task log ------------------");
-                        _background = true;
-                    }
-                    else if (_background)
-                    {
-                        WriteLine("------------------ End background task log ------------------");
-                        _background = false;
-                    }
-
-                    helper.WriteLine(context.Message);
+                    if(!_background)
+                        WriteLine("----------------- background_task ----------------");
+                    _background = true;
                 }
+                else if (_background)
+                {
+                    WriteLine("----------------- /background_task ----------------");
+                    _background = false;
+                }
+
+                helper.WriteLine(context.Message);
             };
         }
 

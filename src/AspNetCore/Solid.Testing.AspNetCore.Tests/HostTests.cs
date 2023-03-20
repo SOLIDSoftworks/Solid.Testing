@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Net.Http.Headers;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -37,20 +38,24 @@ namespace Solid.Testing.AspNetCore.Tests
         [Fact]
         public async Task LoggingTest()
         {
+            var traceparent = $"00-{ActivityTraceId.CreateRandom().ToHexString()}-{ActivitySpanId.CreateRandom().ToHexString()}-00";
+            
             var created = await _fixture
                 .TestingServer
                 .PostAsync("backgroundtasks")
+                .WithHeader(HeaderNames.TraceParent, traceparent)
             ;
             var id = await created.Content.ReadAsStringAsync();
 
             var complete = false;
             while (!complete)
             {
-                await Task.Delay(500);
+                await Task.Delay(700);
                 var poll = await _fixture
                     .TestingServer
                     .GetAsync("backgroundtasks/{id}")
-                    .WithNamedParameter("id", id);
+                    .WithNamedParameter("id", id)
+                    .WithHeader(HeaderNames.TraceParent, traceparent);
 
                 if (poll.StatusCode == HttpStatusCode.NotFound) 
                     Assert.True(false);
