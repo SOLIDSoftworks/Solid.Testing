@@ -70,7 +70,7 @@ namespace Solid.Testing.AspNetCore.Extensions.XUnit
                     
                     if (http?.Request.Headers.TryGetValue(OutputIdHeaderName, out var id) == true)
                     {
-                        context.Properties.Add("id", id);
+                        context.Properties.Add("id", id.ToString());
                         return;
                     }
 
